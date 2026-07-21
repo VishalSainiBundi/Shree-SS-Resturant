@@ -58,7 +58,7 @@ function Header({ menu_data }) {
           </li>
 
           {/* Why Choose Us Dropdown */}
-          <li className="relative group">
+          {/* <li className="relative group">
             <button className="hover:text-yellow-500 transition">
               Why Choose Us ▾
             </button>
@@ -75,7 +75,7 @@ function Header({ menu_data }) {
                 </li>
               ))}
             </ul>
-          </li>
+          </li> */}
 
           <li>
             <Link to={'/about'} className="hover:text-yellow-500">
@@ -89,11 +89,11 @@ function Header({ menu_data }) {
             </Link>
           </li>
 
-          <li>
+          {/* <li>
             <Link to={'/reservation'} className="hover:text-yellow-500">
               Reservation
             </Link>
-          </li>
+          </li> */}
 
           <li>
             <Link to={'/contact'} className="hover:text-yellow-500">

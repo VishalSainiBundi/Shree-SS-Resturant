@@ -9,3 +9,5 @@ const Get_dish=async ()=>{
         
     }
 }
+
+export default Get_dish

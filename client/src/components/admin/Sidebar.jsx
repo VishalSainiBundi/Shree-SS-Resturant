@@ -7,10 +7,10 @@ const AdminSidebar = ({ isSidebarOpen = true, onToggle }) => {
     { title: "Dashboard", path: "/admin/dashboard", icon: "fa-solid fa-gauge-high" },
     { title: "Categories", path: "/admin/categories", icon: "fa-solid fa-layer-group" },
     { title: "Dishes", path: "/admin/dishes", icon: "fa-solid fa-utensils" },
-    { title: "Add Dish", path: "/admin/add-dish", icon: "fa-solid fa-circle-plus" },
+    // { title: "Add Dish", path: "/admin/add-dish", icon: "fa-solid fa-circle-plus" },
     { title: "Orders", path: "/admin/orders", icon: "fa-solid fa-cart-shopping" },
     { title: "Reservations", path: "/admin/reservations", icon: "fa-solid fa-calendar-check" },
-    { title: "Gallery", path: "/admin/gallery", icon: "fa-solid fa-images" },
+    // { title: "Gallery", path: "/admin/gallery", icon: "fa-solid fa-images" },
     { title: "Customers", path: "/admin/customers", icon: "fa-solid fa-users" },
     { title: "Messages", path: "/admin/messages", icon: "fa-solid fa-envelope" },
     { title: "Settings", path: "/admin/settings", icon: "fa-solid fa-gear" },
@@ -22,21 +22,7 @@ const AdminSidebar = ({ isSidebarOpen = true, onToggle }) => {
         isSidebarOpen ? "w-72" : "w-20"
       }`}
     >
-      {/* Brand Section */}
-      <div className={`p-4 border-b border-gray-100 ${!isSidebarOpen && 'flex justify-center'}`}>
-        <Link to="/admin/dashboard" className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-amber-600 to-amber-800 rounded-xl flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-sm">SS</span>
-          </div>
-          {isSidebarOpen && (
-            <div>
-              <h1 className="text-lg font-bold text-amber-800 leading-tight">SHREE SS</h1>
-              <p className="text-[10px] text-gray-500 -mt-0.5">Admin Panel</p>
-            </div>
-          )}
-        </Link>
-      </div>
-
+     
       {/* Navigation */}
       <div className="px-4 py-6">
         {isSidebarOpen && (

@@ -15,7 +15,7 @@ const AddDish = () => {
     name: '',
     description: '',
     price: '',
-    rating: '',
+    // rating: '',/
     image: '',
     main: '',
     sub: '',
@@ -93,7 +93,7 @@ const AddDish = () => {
     setLoading(true);
 
     try {
-      const response = await axiosApiInstance.post('/menu/create', formData);
+      const response = await axiosApiInstance.post('/dish/create', formData);
       console.log(response.data)
       if (response.status === 200) {
         alert('✅ Dish added successfully!');
@@ -246,7 +246,7 @@ const AddDish = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* Rating */}
-              <div>
+              {/* <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   <i className="fas fa-star text-amber-600 mr-2"></i>
                   Rating (1-5)
@@ -262,7 +262,7 @@ const AddDish = () => {
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-600 focus:ring-2 focus:ring-amber-200 transition outline-none"
                   placeholder="e.g., 4.5"
                 />
-              </div>
+              </div> */}
 
               {/* Feature Checkbox */}
               <div className="flex items-center">

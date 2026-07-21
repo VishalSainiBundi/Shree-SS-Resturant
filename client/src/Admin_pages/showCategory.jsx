@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axiosApiInstance from "../../helper";
+import DeleteBtn from "../components/deleteBtn";
 
 const ShowCategory = () => {
   const [categories, setCategories] = useState([]);
@@ -25,24 +26,29 @@ const ShowCategory = () => {
     getCategories();
   }, []);
 
-  const deleteCategory = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this category?"
-    );
-
-    if (!confirmDelete) return;
-
-    try {
-      const res = await axiosApiInstance.delete(`/menu/delete/${id}`);
-
-      alert(res.data.msg);
-
-      getCategories();
-    } catch (error) {
-      console.log(error);
-      alert("Delete Failed");
-    }
+  const imageUrl = (image) => {
+    if (!image || image.startsWith("http")) return image;
+    return `${import.meta.env.VITE_API_URL}${image}`;
   };
+
+  // const deleteCategory = async (id) => {
+  //   const confirmDelete = window.confirm(
+  //     "Are you sure you want to delete this category?"
+  //   );
+
+  //   if (!confirmDelete) return;
+
+  //   try {
+  //     const res = await axiosApiInstance.delete(`/menu/delete/${id}`);
+
+  //     alert(res.data.msg);
+
+  //     getCategories();
+  //   } catch (error) {
+  //     console.log(error);
+  //     alert("Delete Failed");
+  //   }
+  // };
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -75,6 +81,7 @@ const ShowCategory = () => {
                 <th className="p-4">#</th>
                 <th>Main Category</th>
                 <th>Sub Category</th>
+                <th>Image</th>
                 <th>Status</th>
                 <th>Action</th>
 
@@ -86,13 +93,13 @@ const ShowCategory = () => {
 
               {loading ? (
                 <tr>
-                  <td colSpan="5" className="text-center py-10">
+                  <td colSpan="6" className="text-center py-10">
                     Loading...
                   </td>
                 </tr>
               ) : categories.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="text-center py-10">
+                  <td colSpan="6" className="text-center py-10">
                     No Category Found
                   </td>
                 </tr>
@@ -108,6 +115,18 @@ const ShowCategory = () => {
 
                     <td>{item.sub}</td>
 
+                    {/* <td>
+                      <img
+                        src={imageUrl(item.image)}
+                        alt={item.sub}
+                        className="h-12 w-12 rounded-md object-cover"
+                      />
+                    </td> */}
+
+                    <td>
+                      {item.image}
+                    </td>
+
                     <td>
                       {item.status ? (
                         <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
@@ -122,23 +141,9 @@ const ShowCategory = () => {
 
                     <td>
 
-                      <div className="flex gap-3 justify-center">
 
-                        <Link
-                          to={`/admin/category/edit/${item._id}`}
-                          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded"
-                        >
-                          Edit
-                        </Link>
+                        <DeleteBtn id={item._id} url={`/menu/`} onDelete={getCategories}/>
 
-                        <button
-                          onClick={() => deleteCategory(item._id)}
-                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded"
-                        >
-                          Delete
-                        </button>
-
-                      </div>
 
                     </td>
 
