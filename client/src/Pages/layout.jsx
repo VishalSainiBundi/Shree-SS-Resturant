@@ -11,7 +11,12 @@ const Page_layout = () => {
     const fetchMenu = async () => {
       try {
         const data = await GetMenu();
-        setMenuData(data);
+        // API returns { success: true, data: [...] } — extract the array
+        if (data?.success && Array.isArray(data.data)) {
+          setMenuData(data.data);
+        } else {
+          console.error("Unexpected menu response shape:", data);
+        }
       } catch (err) {
         console.error(err);
       }

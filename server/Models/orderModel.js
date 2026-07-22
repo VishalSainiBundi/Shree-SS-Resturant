@@ -9,7 +9,18 @@ const orderScema= mongoose.Schema({
         type:Number,
         required:true
     },
-    qty:{
+
+total:{
+        type:Number,
+        required:true
+    },  
+    
+    delivryCharge:{
+        type:Number,
+        required:true,
+        default:50
+    },
+     qty:{
         type:String,
         required:true,
         default:1

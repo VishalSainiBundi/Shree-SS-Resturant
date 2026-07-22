@@ -120,15 +120,6 @@ export default function AddCategory() {
         }
       );
 
-// const responsee = await axiosApiInstance.post(
-//   "/menu/create",
-//   data,
-//   {
-//     headers: {
-//       "Content-Type": "multipart/form-data",
-//     },
-//   }
-// );
 
 console.log("Response =>", response);
 console.log("Response Data =>", response.data);

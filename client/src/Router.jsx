@@ -6,30 +6,39 @@ import Gallery from "./Pages/gallery";
 import AuthPage from "./Pages/register";
 import { useEffect, useState } from "react";
 import Get_dish from "../api_calls/getDish";
-// import About from "./components/About";
-// import Contact from "./components/Contact";
+import GetMenu from "../api_calls/getMenu";
+import ViewCategoryDishes from "./Pages/view";
+import DishDetail from "./components/dishDetal"
+
 
 const Page_Router =() => {
 
 const [dish, setdish]= useState([])
+const [category, setcategory]= useState([])
 
 useEffect(
   ()=>{
    const fetchDish=async ()=>{
     const data= await Get_dish()
+    const catdata= await GetMenu()
+    setcategory(catdata.data)
     setdish(data.data)
    }
    fetchDish()
   },[]
 )
 
+// console.log(category)
+
   return (
     <Routes>
-      <Route path="/" element={<Home dish={dish} />} />
+      <Route path="/" element={<Home dish={dish} category={category}/>} />
       <Route path="/gallery" element={<Gallery />} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/auth" element={<AuthPage />} />
+      <Route path="/view/:id" element={<ViewCategoryDishes  dish={dish} category={category}/>} />
+      <Route path="/dishDetail/:id" element={<DishDetail  dishData={dish} />} />
     </Routes>
   );
 };

@@ -29,13 +29,10 @@ const AddDish = () => {
       try {
         const data = await GetMenu();
         console.log("Full API Response:", data);
-        
-        // Get the menu array from the response
-        let menuData = data?.menu || data?.data || data;
-        
-        // If menuData is an array, use it directly
-        const categoriesArray = Array.isArray(menuData) ? menuData : [];
-        
+
+        // API returns { success: true, data: [...] }
+        const categoriesArray = (data?.success && Array.isArray(data.data)) ? data.data : [];
+
         console.log("Categories Array:", categoriesArray);
         setCategories(categoriesArray);
 
@@ -47,9 +44,7 @@ const AddDish = () => {
         // Extract all sub categories
         const subs = categoriesArray.map(item => item.sub);
         console.log("All Sub Categories:", subs);
-        setSubCategories(subs);
-
-      } catch (error) {
+        setSubCategories(subs);      } catch (error) {
         console.error('Error fetching categories:', error);
       }
     };

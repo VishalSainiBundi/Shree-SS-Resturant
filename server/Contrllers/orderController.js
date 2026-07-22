@@ -11,7 +11,9 @@ const orderDaat= await OrderModel.create({
     price:data.price,
     image:data.image,
     sub:data.sub,
-    qty:data.qty
+    qty:data.qty,
+    total:total,
+    delivryCharge:delivryCharge
 
 })
 return res.send(
