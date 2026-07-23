@@ -93,11 +93,11 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
-    role: {
-      type: String,
-      enum: ["customer", "admin", "manager", "staff"],
-      default: "customer",
-    },
+    // role: {
+    //   type: String,
+    //   enum: ["customer", "admin", "manager", "staff"],
+    //   default: "customer",
+    // },
 
     // Multiple Addresses
     addresses: [addressSchema],

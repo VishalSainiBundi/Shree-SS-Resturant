@@ -239,7 +239,7 @@ const ViewCategoryDishes = ({ dish = [], category = [] }) => {
 
                     <div className="flex gap-2 pt-3 border-t border-gray-100">
                       <Link
-                        to={`/dish/${dishItem._id || dishItem.id}`}
+                        to={`/dishDetail/${dishItem._id}`}
                         className="flex-1 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white text-center px-4 py-2 rounded-xl text-sm font-medium transition shadow-md hover:shadow-lg"
                       >
                         View Details

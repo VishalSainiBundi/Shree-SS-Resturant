@@ -5,6 +5,8 @@ import AddDish from "./add_Dish";
 import AdminDishes from "./Showdish";
 import ShowCategory from "./showCategory";
 import AddCategory from "./addCategory";
+import AddTable from "./add_table";
+import AdminTables from "./showTable";
 
 
 const Admin_Page_Router = () => {
@@ -16,6 +18,8 @@ const Admin_Page_Router = () => {
       <Route path="/dishes" element={<AdminDishes />} />
       <Route path="/categories" element={<ShowCategory />} />
       <Route path="/category/add" element={<AddCategory />} />
+      <Route path="/tables" element={<AdminTables />} />
+      <Route path="/table/add" element={<AddTable />} />
   
       {/* <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />

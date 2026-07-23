@@ -9,6 +9,8 @@ import Get_dish from "../api_calls/getDish";
 import GetMenu from "../api_calls/getMenu";
 import ViewCategoryDishes from "./Pages/view";
 import DishDetail from "./components/dishDetal"
+import OrderConfirmed from "./components/orderConfirmed";
+import BookTable from "./Pages/reservTable";
 
 
 const Page_Router =() => {
@@ -38,7 +40,10 @@ useEffect(
       <Route path="/contact" element={<Contact />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/view/:id" element={<ViewCategoryDishes  dish={dish} category={category}/>} />
-      <Route path="/dishDetail/:id" element={<DishDetail  dishData={dish} />} />
+      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/order-confired" element={<OrderConfirmed />} />
+      <Route path="/reserv_table" element={<BookTable />} />
+      <Route path="/dishDetail/:id" element={<DishDetail  dishData={dish} category={category} />} />
     </Routes>
   );
 };

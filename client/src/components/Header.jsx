@@ -1,14 +1,9 @@
 import { Link } from "react-router-dom";
 
 function Header({ menu_data }) {
-  const menu = menu_data?.menu?.filter(
-    (d) => d.main === "Menu"
-  ) || [];
+  const menu = menu_data
 
-  const chooseUs = menu_data?.menu?.filter(
-    (d) => d.main === "Why choose us"
-  ) || [];
-
+  
   return (
     <header className="absolute top-0 left-0 w-full z-50 px-16 py-5 flex justify-between items-center bg-black/30 backdrop-blur-md">
       {/* Logo */}

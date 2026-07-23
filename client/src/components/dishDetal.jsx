@@ -1,53 +1,21 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import axiosApiInstance from "../../helper";
+// import axiosApiInstance from "../../helper";
+import axios from "axios"
 
-const DishDetail = ({ dishData }) => {
+const DishDetail = ({ dishData, category }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   
   // Find dish by ID
   const dish = dishData?.find((d) => d._id === id);
+  // console.log(dish,"Detail_Dish")
 
-  // Related dishes (static for UI)
-  const relatedDishes = [
-    { 
-      _id: "2", 
-      name: "Paneer Butter Masala", 
-      price: 399, 
-      rating: 4.6, 
-      image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?q=80&w=2070&auto=format&fit=crop", 
-      sub: "Vegetarian", 
-      feature: true 
-    },
-    { 
-      _id: "3", 
-      name: "Chicken Tikka", 
-      price: 349, 
-      rating: 4.7, 
-      image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=2070&auto=format&fit=crop", 
-      sub: "Appetizer", 
-      feature: false 
-    },
-    { 
-      _id: "4", 
-      name: "Garlic Naan", 
-      price: 89, 
-      rating: 4.4, 
-      image: "https://images.unsplash.com/photo-1628294895950-9805252327bc?q=80&w=2070&auto=format&fit=crop", 
-      sub: "Breads", 
-      feature: false 
-    },
-    { 
-      _id: "5", 
-      name: "Mango Lassi", 
-      price: 149, 
-      rating: 4.5, 
-      image: "https://images.unsplash.com/photo-1627697961795-8ba6af36c18a?q=80&w=2070&auto=format&fit=crop", 
-      sub: "Beverages", 
-      feature: false 
-    }
-  ];
+const relatedDishes= dishData.filter(
+  (d)=> d.sub === dish.sub
+)
+
+
 
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
@@ -71,57 +39,54 @@ const DishDetail = ({ dishData }) => {
   // ==========================
   // Order Now Handler - Saves to Database
   // ==========================
-  const handleOrderNow = async () => {
-    if (!dish) return;
-    
-    try {
-      setOrderLoading(true);
-      
-      // Prepare order data with current quantity and price
-      const orderData = {
-        dishId: dish._id,
-        name: dish.name,
-        description: dish.description,
-        price: dish.price,
-        image: dish.image,
-        main: dish.main,
-        sub: dish.sub,
-        quantity: quantity, // Current selected quantity
-        totalPrice: totalPrice, // Price * Quantity
-        deliveryCharge: deliveryCharge,
-        grandTotal: grandTotal,
-        status: "pending",
-        orderDate: new Date().toISOString()
-      };
+const handleOrderNow = async () => {
+  if (!dish) return;
 
-      console.log("📤 Sending order data:", orderData);
+  try {
+    setOrderLoading(true);
 
-      // Save to database via API
-      const response = await axiosApiInstance.post("/order/create", orderData);
-      
-      console.log("📥 Order response:", response.data);
+    const orderData = {
+      name: dish.name,
+      price: dish.price,
+      totalprice: totalPrice,      // Fixed
+      image: dish.image,
+      sub: dish.sub,
+      qty: quantity,
+      total: grandTotal,
+      deliveryCharge: deliveryCharge, // Fixed
+      orderDate: new Date().toISOString(),
+    };
 
-      if (response.status === 200 || response.status === 201) {
-        alert("✅ Order Placed Successfully!");
-        navigate("/order-confirmation", { 
-          state: { 
-            order: response.data, 
-            dish: dish, 
-            qty: quantity,
-            price: totalPrice,
-            delivryCharge: deliveryCharge,
-            total: grandTotal
-          } 
-        });
-      }
-    } catch (error) {
-      console.error("❌ Error placing order:", error);
-      alert(error.response?.data?.msg || "Failed to place order. Please try again.");
-    } finally {
-      setOrderLoading(false);
+    console.log("📤 Sending order:", orderData);
+
+    // const response = await axiosApiInstance.post(
+    //   "/order/create",
+    //   orderData
+    // );
+
+    const response = await axios.post(
+      "http://localhost:5000/order/create",
+      orderData
+    );
+
+
+
+
+    console.log("📥 Response:", response.data);
+
+    if (response.data.flag === 0) {
+      alert("✅ Order Placed Successfully!");
+      navigate("/order-confired");
+    } else {
+      alert(response.data.msg || "Order Failed");
     }
-  };
-
+  } catch (error) {
+    console.error("❌ Error:", error);
+    alert(error.response?.data?.msg || "Failed to place order.");
+  } finally {
+    setOrderLoading(false);
+  }
+};
   // ==========================
   // Image URL Helper
   // ==========================
@@ -559,11 +524,12 @@ const DishDetail = ({ dishData }) => {
               </Link>
             </div>
 
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {relatedDishes.map((item) => (
                 <Link
                   key={item._id}
-                  to={`/dish/${item._id}`}
+                  to={`/dishDetail/${item._id}`}
                   className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100"
                 >
                   <div className="relative h-48 overflow-hidden bg-amber-50">

@@ -11,7 +11,7 @@ const verifycode = Math.floor(10000 + Math.random() * 90000);
       email: data.email,
       phone: data.phone,
       password: data.password,
-      role: data.role,
+      // role: data.role,
       address: data.address,
       verifycode:verifycode
     });
@@ -46,6 +46,57 @@ const get = async (req, res) => {
     });
   }
 };
+
+
+const login=async (req, res)=>{
+  const data = req.body
+  try {
+    
+const user= await userModel.findOne({email:data.email})
+
+if(!user) {
+  res.send({
+    msg:'user not exist ',
+    flag:1
+  })
+}
+
+if(user.email !==data.email){
+  return res.send({
+    msg:"Email are invailied",
+    flag:1
+  })
+}
+
+else if (user.password !=data.password){
+  return res.send({
+    msg:"Password not match",
+    flag:1
+  })
+}
+
+return res.send(
+  {
+    user,
+    msg:"User login sucessfully",
+    flag:0
+  }
+)
+
+  } catch (error) {
+    console.log(error)
+return res.send(
+  {
+    msg:"Login error",
+    flag:1
+  }
+)    
+  }
+}
+
+// const logout=(req, res)=>{
+
+// }
 
 // =======================
 // UPDATE USER
@@ -222,4 +273,4 @@ const deleteAddress = async (req, res) => {
 };
 
 
-module.exports= {create, get, update, Delete, addAddress, updateAddress, deleteAddress}
+module.exports= {create, get, update, Delete, addAddress, updateAddress, deleteAddress, login}
