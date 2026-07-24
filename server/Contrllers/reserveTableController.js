@@ -34,9 +34,8 @@ return res.send({
 }
 
 const getBook = async (req, res)=>{
-    const {id} = req.params
     try {
-        const reserdata= await reserveTableModel.findById(id)
+        const reserdata= await reserveTableModel.find()
         return res.send({
             reserdata,
             msg:"Sucess data",

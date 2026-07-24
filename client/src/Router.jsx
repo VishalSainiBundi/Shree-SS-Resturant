@@ -13,6 +13,7 @@ import OrderConfirmed from "./components/orderConfirmed";
 import BookTable from "./Pages/reservTable";
 import Get_Table from "../api_calls/getTable";
 import ReservationSuccess from "./Pages/reservSucessful";
+import get_Reserve from "../api_calls/getReserv";
 
 
 const Page_Router =() => {
@@ -20,6 +21,7 @@ const Page_Router =() => {
 const [dish, setdish]= useState([])
 const [category, setcategory]= useState([])
 const [table, settable] =useState([])
+const [reserv, setreserve] =useState([])
 
 useEffect(
   ()=>{
@@ -27,7 +29,9 @@ useEffect(
     const data= await Get_dish()
     const catdata= await GetMenu()
     const table_data= await Get_Table()
-    // console.log(table_data,"tableData")
+    const reserve_data= await get_Reserve()
+    console.log(reserve_data,"reservData")
+    setreserve(reserve_data)
     settable(table_data)
     setcategory(catdata.data)
     setdish(data.data)
