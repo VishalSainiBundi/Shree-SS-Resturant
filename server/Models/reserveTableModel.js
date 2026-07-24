@@ -75,6 +75,10 @@ const reservetableSchema = new mongoose.Schema(
     //   default: "",
     // },
   },
+//   deleteAt: {
+//   type: Date,
+//   expires: 0
+// },
   {
     timestamps: true,
   }

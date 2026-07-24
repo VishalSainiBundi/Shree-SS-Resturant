@@ -51,21 +51,45 @@ const getBook = async (req, res)=>{
     }
 }
 
-const status= async (req, res)=>{
-    try {
-    const tableData= await reserveModel.find()
+const status = async (req, res) => {
+  try {
+    const tableData = await reserveModel.find();
+    const reservData = await reserveTableModel.find();
+
+    for (const table of tableData) {
+      const isReserved = reservData.some(
+        reserve => reserve.tableNo === table.tableNo
+      );
+
+      await reserveModel.updateOne(
+        { _id: table._id },
+        {
+          $set: {
+            status: !isReserved
+          }
+        }
+      );
+    }
+
+    const updatedTables = await reserveModel.find();
+
     return res.send({
-        tableData,
-        msg:"table data"
-    }
-    )
-    } catch (error) {
-        console.log(error)
-        return res.send({
-            msg:"Internal error",
-            flag:1
-        })
-    }
+      data: updatedTables,
+      msg: "Table status updated"
+    });
+
+  } catch (error) {
+    console.log(error);
+
+    return res.send({
+      msg: "Internal error",
+      flag: 1
+    });
+  }
+};
+
+const Delete = async (req, res) =>{
+
 }
 
 module.exports = {bookTable, getBook, status}
