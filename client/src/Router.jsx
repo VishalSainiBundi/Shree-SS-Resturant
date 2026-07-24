@@ -12,6 +12,7 @@ import DishDetail from "./components/dishDetal"
 import OrderConfirmed from "./components/orderConfirmed";
 import BookTable from "./Pages/reservTable";
 import Get_Table from "../api_calls/getTable";
+import ReservationSuccess from "./Pages/reservSucessful";
 
 
 const Page_Router =() => {
@@ -48,6 +49,7 @@ useEffect(
       {/* <Route path="/auth" element={<AuthPage />} /> */}
       <Route path="/order-confired" element={<OrderConfirmed />} />
       <Route path="/reservation" element={<BookTable table_data={table}/>} />
+      <Route path="/reservation_sucess/:id" element={<ReservationSuccess table_data={table}/>} />
       <Route path="/dishDetail/:id" element={<DishDetail  dishData={dish} category={category} />} />
     </Routes>
   );

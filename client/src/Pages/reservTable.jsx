@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axiosApiInstance from "../../helper";
 import {
   Search,
   Users,
@@ -17,6 +18,7 @@ import {
   Shield,
   Gift,
   Heart,
+  Loader2,
 } from "lucide-react";
 
 // Map category names to their respective icons and colors
@@ -53,6 +55,15 @@ const getCategoryConfig = (category) => {
   return configs[category] || configs["Classic Dining"];
 };
 
+// Create axios instance with base configuration
+// const api = axios.create({
+//   baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000/api",
+//   headers: {
+//     "Content-Type": "application/json",
+//   },
+//   timeout: 10000, // 10 seconds timeout
+// });
+
 const BookTable = ({ table_data }) => {
   console.log(table_data, "tableData");
 
@@ -70,9 +81,10 @@ const BookTable = ({ table_data }) => {
       acc[category].push({
         id: item._id || Math.random(),
         tableNo: item.tableNo || "Unknown",
-        seats: item.capecity || item.capacity || 2, // Handle both spellings
+        seats: item.capecity || item.capacity || 2,
         status: item.status ? "Available" : "Occupied",
         price: item.price || 0,
+        category: category,
       });
       return acc;
     }, {});
@@ -80,7 +92,6 @@ const BookTable = ({ table_data }) => {
     // Convert to sections array
     return Object.keys(grouped).map((category, index) => {
       const config = getCategoryConfig(category);
-      // Get min price for the section
       const minPrice = Math.min(...grouped[category].map(t => t.price));
       return {
         id: index + 1,
@@ -108,6 +119,9 @@ const BookTable = ({ table_data }) => {
   const [guestPhone, setGuestPhone] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
   const [specialRequest, setSpecialRequest] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [bookingError, setBookingError] = useState("");
+  const [bookingSuccess, setBookingSuccess] = useState("");
 
   const statusStyle = (status) => {
     switch (status) {
@@ -124,22 +138,85 @@ const BookTable = ({ table_data }) => {
 
   const handleBookNow = (table) => {
     setSelectedTable(table);
+    setBookingError("");
+    setBookingSuccess("");
     document.getElementById("booking-form").scrollIntoView({ 
       behavior: "smooth",
       block: "center",
     });
   };
 
-  const handleBookingSubmit = (e) => {
+  const handleBookingSubmit = async (e) => {
     e.preventDefault();
-    alert(`✅ Table ${selectedTable?.tableNo} booked successfully!\n\nName: ${guestName}\nDate: ${bookingDate}\nTime: ${bookingTime}\nPrice: ₹${selectedTable?.price}`);
-    setSelectedTable(null);
-    setGuestName("");
-    setGuestPhone("");
-    setGuestEmail("");
-    setBookingDate("");
-    setBookingTime("");
-    setSpecialRequest("");
+    
+    // Validate all required fields
+    if (!guestName || !guestPhone || !guestEmail || !bookingDate || !bookingTime) {
+      setBookingError("Please fill in all required fields");
+      return;
+    }
+
+    setIsLoading(true);
+    setBookingError("");
+    setBookingSuccess("");
+
+    try {
+      // Prepare booking data
+      const bookingData = {
+        customerName: guestName,
+        phone: guestPhone,
+        email: guestEmail,
+        tableNo: selectedTable.tableNo,
+        price: selectedTable.price,
+        capecity: selectedTable.seats,
+        bookingDate: bookingDate,
+        bookingTime: bookingTime,
+        category: selectedTable.category || "Classic Dining",
+        specialRequest: specialRequest,
+      };
+
+      console.log("Sending booking data:", bookingData);
+
+      // Make API call using axios
+      const response = await axiosApiInstance.post ("/reserve/create", bookingData);
+      
+      console.log("Booking response:", response.data);
+
+      // Check if booking was successful
+      if (response.data.flag === 0) {
+        // Success
+        setBookingSuccess(`✅ Table ${selectedTable.tableNo} booked successfully!`);
+        alert(`✅ Table ${selectedTable?.tableNo} booked successfully!\n\nName: ${guestName}\nDate: ${bookingDate}\nTime: ${bookingTime}\nPrice: ₹${selectedTable?.price}`);
+        
+        // Reset form
+        setSelectedTable(null);
+        setGuestName("");
+        setGuestPhone("");
+        setGuestEmail("");
+        setBookingDate("");
+        setBookingTime("");
+        setSpecialRequest("");
+      } else {
+        // Error from backend
+        setBookingError(response.data.msg || "Booking failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Booking error:", error);
+      
+      // Handle different types of errors
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        setBookingError(error.response.data?.msg || `Server error: ${error.response.status}`);
+      } else if (error.request) {
+        // The request was made but no response was received
+        setBookingError("No response from server. Please check your connection.");
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setBookingError(error.message || "An unexpected error occurred.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getStatusIcon = (status) => {
@@ -364,7 +441,7 @@ const BookTable = ({ table_data }) => {
                         disabled={table.status !== "Available"}
                         className={`w-full py-3.5 rounded-2xl font-semibold transition-all duration-300 transform ${
                           table.status === "Available"
-                            ? `bg-gradient-to-r ${section.color} hover:scale-[1.02] hover:shadow-xl text-white group-hover:shadow-${section.color.split(' ')[1]}/30`
+                            ? `bg-gradient-to-r ${section.color} hover:scale-[1.02] hover:shadow-xl text-white`
                             : "bg-gray-100 text-gray-400 cursor-not-allowed"
                         }`}
                       >
@@ -433,6 +510,18 @@ const BookTable = ({ table_data }) => {
               </div>
 
               <div className="p-6 lg:p-8">
+                {/* Error/Success Messages */}
+                {bookingError && (
+                  <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+                    {bookingError}
+                  </div>
+                )}
+                {bookingSuccess && (
+                  <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm">
+                    {bookingSuccess}
+                  </div>
+                )}
+
                 {/* Price Summary */}
                 <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-5 mb-6 border border-amber-200">
                   <div className="flex justify-between items-center">
@@ -460,7 +549,7 @@ const BookTable = ({ table_data }) => {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1.5">
                         <User size={16} className="inline mr-1.5 text-amber-500" />
-                        Full Name
+                        Full Name *
                       </label>
                       <input
                         type="text"
@@ -474,7 +563,7 @@ const BookTable = ({ table_data }) => {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1.5">
                         <Phone size={16} className="inline mr-1.5 text-amber-500" />
-                        Phone Number
+                        Phone Number *
                       </label>
                       <input
                         type="tel"
@@ -493,12 +582,13 @@ const BookTable = ({ table_data }) => {
                         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                         <polyline points="22,6 12,13 2,6"/>
                       </svg>
-                      Email Address
+                      Email Address *
                     </label>
                     <input
                       type="email"
                       value={guestEmail}
                       onChange={(e) => setGuestEmail(e.target.value)}
+                      required
                       placeholder="Enter your email"
                       className="w-full border-2 border-gray-200 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-4 focus:ring-amber-200 focus:border-amber-400 transition"
                     />
@@ -508,20 +598,21 @@ const BookTable = ({ table_data }) => {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1.5">
                         <Calendar size={16} className="inline mr-1.5 text-amber-500" />
-                        Date
+                        Date *
                       </label>
                       <input
                         type="date"
                         value={bookingDate}
                         onChange={(e) => setBookingDate(e.target.value)}
                         required
+                        min={new Date().toISOString().split('T')[0]}
                         className="w-full border-2 border-gray-200 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-4 focus:ring-amber-200 focus:border-amber-400 transition"
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1.5">
                         <Clock size={16} className="inline mr-1.5 text-amber-500" />
-                        Time
+                        Time *
                       </label>
                       <input
                         type="time"
@@ -549,10 +640,22 @@ const BookTable = ({ table_data }) => {
 
                   <button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-[1.02] flex items-center justify-center gap-3 text-lg"
+                    disabled={isLoading}
+                    className={`w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-[1.02] flex items-center justify-center gap-3 text-lg ${
+                      isLoading ? "opacity-70 cursor-not-allowed" : ""
+                    }`}
                   >
-                    <CheckCircle size={22} />
-                    Confirm Booking • ₹{selectedTable.price}
+                    {isLoading ? (
+                      <>
+                        <Loader2 size={22} className="animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle size={22} />
+                        Confirm Booking • ₹{selectedTable.price}
+                      </>
+                    )}
                   </button>
 
                   <p className="text-xs text-gray-400 text-center flex items-center justify-center gap-2">
