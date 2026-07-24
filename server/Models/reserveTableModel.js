@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const tableBookingSchema = new mongoose.Schema(
+const reservetableSchema = new mongoose.Schema(
   {
     customerName: {
       type: String,
@@ -80,5 +80,5 @@ const tableBookingSchema = new mongoose.Schema(
   }
 );
 
-const reserveModel = mongoose.model("TableBooking", tableBookingSchema);
-module.exports = reserveModel
+const reserveTableModel = mongoose.model("ReserveTableBooking", reservetableSchema);
+module.exports = reserveTableModel

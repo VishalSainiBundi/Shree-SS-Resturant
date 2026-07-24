@@ -1,5 +1,5 @@
 const express= require('express')
-const { create, get } = require('../Contrllers/reservController')
+const { create, get, } = require('../Contrllers/reservController')
 
 const reserveRoute= express.Router()
 

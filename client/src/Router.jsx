@@ -11,18 +11,23 @@ import ViewCategoryDishes from "./Pages/view";
 import DishDetail from "./components/dishDetal"
 import OrderConfirmed from "./components/orderConfirmed";
 import BookTable from "./Pages/reservTable";
+import Get_Table from "../api_calls/getTable";
 
 
 const Page_Router =() => {
 
 const [dish, setdish]= useState([])
 const [category, setcategory]= useState([])
+const [table, settable] =useState([])
 
 useEffect(
   ()=>{
    const fetchDish=async ()=>{
     const data= await Get_dish()
     const catdata= await GetMenu()
+    const table_data= await Get_Table()
+    // console.log(table_data,"tableData")
+    settable(table_data)
     setcategory(catdata.data)
     setdish(data.data)
    }
@@ -40,9 +45,9 @@ useEffect(
       <Route path="/contact" element={<Contact />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/view/:id" element={<ViewCategoryDishes  dish={dish} category={category}/>} />
-      <Route path="/auth" element={<AuthPage />} />
+      {/* <Route path="/auth" element={<AuthPage />} /> */}
       <Route path="/order-confired" element={<OrderConfirmed />} />
-      <Route path="/reserv_table" element={<BookTable />} />
+      <Route path="/reservation" element={<BookTable table_data={table}/>} />
       <Route path="/dishDetail/:id" element={<DishDetail  dishData={dish} category={category} />} />
     </Routes>
   );

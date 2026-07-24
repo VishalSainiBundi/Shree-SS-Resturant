@@ -19,73 +19,87 @@ import {
   Heart,
 } from "lucide-react";
 
-const sections = [
-  {
-    id: 1,
-    title: "Royal Dining",
-    icon: Crown,
-    color: "from-amber-400 via-amber-500 to-orange-500",
-    border: "border-amber-400",
-    bgLight: "bg-amber-50",
-    description:
-      "Experience the epitome of luxury with royal interiors, candle-lit ambiance, and personalized butler service.",
-    price: 499,
-    priceLabel: "Premium Seating",
-    badge: "Royal",
-    tables: [
-      { id: 1, tableNo: "R-01", seats: 2, status: "Available", price: 499 },
-      { id: 2, tableNo: "R-02", seats: 4, status: "Reserved", price: 799 },
-      { id: 3, tableNo: "R-03", seats: 6, status: "Available", price: 999 },
-      { id: 4, tableNo: "R-04", seats: 8, status: "Occupied", price: 1299 },
-      { id: 5, tableNo: "R-05", seats: 10, status: "Available", price: 1599 },
-      { id: 6, tableNo: "R-06", seats: 12, status: "Available", price: 1999 },
-    ],
-  },
-  {
-    id: 2,
-    title: "Business Dining",
-    icon: BriefcaseBusiness,
-    color: "from-blue-600 via-indigo-700 to-gray-900",
-    border: "border-blue-400",
-    bgLight: "bg-blue-50",
-    description:
-      "Professional environment designed for high-level meetings, conferences, and corporate dining experiences.",
-    price: 399,
-    priceLabel: "Executive Seating",
-    badge: "Corporate",
-    tables: [
-      { id: 7, tableNo: "B-01", seats: 4, status: "Available", price: 699 },
-      { id: 8, tableNo: "B-02", seats: 6, status: "Occupied", price: 899 },
-      { id: 9, tableNo: "B-03", seats: 8, status: "Reserved", price: 1099 },
-      { id: 10, tableNo: "B-04", seats: 4, status: "Available", price: 699 },
-      { id: 11, tableNo: "B-05", seats: 6, status: "Available", price: 899 },
-      { id: 12, tableNo: "B-06", seats: 10, status: "Available", price: 1499 },
-    ],
-  },
-  {
-    id: 3,
-    title: "Classic Dining",
-    icon: UtensilsCrossed,
-    color: "from-orange-400 via-red-500 to-rose-600",
-    border: "border-orange-400",
-    bgLight: "bg-orange-50",
-    description:
-      "Perfect for families and friends with comfortable seating, warm ambiance, and delicious meals.",
-    price: 299,
-    priceLabel: "Standard Seating",
-    badge: "Classic",
-    tables: [
-      { id: 13, tableNo: "C-01", seats: 2, status: "Available", price: 299 },
-      { id: 14, tableNo: "C-02", seats: 4, status: "Reserved", price: 499 },
-      { id: 15, tableNo: "C-03", seats: 6, status: "Available", price: 699 },
-      { id: 16, tableNo: "C-04", seats: 8, status: "Occupied", price: 899 },
-      { id: 17, tableNo: "C-05", seats: 4, status: "Available", price: 499 },
-      { id: 18, tableNo: "C-06", seats: 10, status: "Available", price: 1199 },
-    ],
-  },
-];
+// Map category names to their respective icons and colors
+const getCategoryConfig = (category) => {
+  const configs = {
+    "Royal Dining": {
+      icon: Crown,
+      color: "from-amber-400 via-amber-500 to-orange-500",
+      border: "border-amber-400",
+      bgLight: "bg-amber-50",
+      description: "Experience the epitome of luxury with royal interiors, candle-lit ambiance, and personalized butler service.",
+      priceLabel: "Premium Seating",
+      badge: "Royal",
+    },
+    "Business Dining": {
+      icon: BriefcaseBusiness,
+      color: "from-blue-600 via-indigo-700 to-gray-900",
+      border: "border-blue-400",
+      bgLight: "bg-blue-50",
+      description: "Professional environment designed for high-level meetings, conferences, and corporate dining experiences.",
+      priceLabel: "Executive Seating",
+      badge: "Corporate",
+    },
+    "Classic Dining": {
+      icon: UtensilsCrossed,
+      color: "from-orange-400 via-red-500 to-rose-600",
+      border: "border-orange-400",
+      bgLight: "bg-orange-50",
+      description: "Perfect for families and friends with comfortable seating, warm ambiance, and delicious meals.",
+      priceLabel: "Standard Seating",
+      badge: "Classic",
+    },
+  };
+  return configs[category] || configs["Classic Dining"];
+};
 
-const BookTable = () => {
+const BookTable = ({ table_data }) => {
+  console.log(table_data, "tableData");
+
+  // Transform API data into sections structure
+  const buildSections = () => {
+    if (!table_data || !Array.isArray(table_data)) return [];
+    
+    // Group tables by category
+    const grouped = table_data.reduce((acc, item) => {
+      const category = item.category || "Classic Dining";
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      // Map API fields to component fields
+      acc[category].push({
+        id: item._id || Math.random(),
+        tableNo: item.tableNo || "Unknown",
+        seats: item.capecity || item.capacity || 2, // Handle both spellings
+        status: item.status ? "Available" : "Occupied",
+        price: item.price || 0,
+      });
+      return acc;
+    }, {});
+
+    // Convert to sections array
+    return Object.keys(grouped).map((category, index) => {
+      const config = getCategoryConfig(category);
+      // Get min price for the section
+      const minPrice = Math.min(...grouped[category].map(t => t.price));
+      return {
+        id: index + 1,
+        title: category,
+        icon: config.icon,
+        color: config.color,
+        border: config.border,
+        bgLight: config.bgLight,
+        description: config.description,
+        price: minPrice,
+        priceLabel: config.priceLabel,
+        badge: config.badge,
+        tables: grouped[category],
+      };
+    });
+  };
+
+  const sections = buildSections();
+
   const [search, setSearch] = useState("");
   const [selectedTable, setSelectedTable] = useState(null);
   const [bookingDate, setBookingDate] = useState("");
@@ -140,6 +154,23 @@ const BookTable = () => {
         return null;
     }
   };
+
+  // Show loading or empty state if no data
+  if (!table_data || table_data.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50/50 via-white to-orange-50/30 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-20">
+          <div className="w-28 h-28 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 mx-auto flex items-center justify-center mb-6 shadow-xl">
+            <UtensilsCrossed size={44} className="text-amber-400" />
+          </div>
+          <h2 className="text-3xl font-bold text-gray-700">No Tables Available</h2>
+          <p className="text-gray-500 mt-3 max-w-sm mx-auto">
+            Please check back later for table availability.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50/50 via-white to-orange-50/30 py-16">

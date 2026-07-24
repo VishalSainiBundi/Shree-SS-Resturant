@@ -10,6 +10,7 @@ const userRouter = require("./Routes/userRoute");
 const menuRoute = require("./Routes/menuRoute");
 const OrderRoute = require("./Routes/orderRoute");
 const reserveRoute = require("./Routes/reserveRoute");
+const bookReserveRoute = require("./Routes/bookReserveRoute");
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use("/user", userRouter);
 app.use("/menu", menuRoute);
 app.use("/order", OrderRoute);
 app.use("/add_table", reserveRoute);
+app.use("/reserve", bookReserveRoute);
 
 // Global error handler - must come after all routes
 app.use((err, req, res, next) => {

@@ -38,18 +38,19 @@ const AdminTables = () => {
     try {
       const response = await axiosApiInstance.get('/add_table/get');
       const data = response.data?.data || response.data || [];
-      console.log("Tables:", data);
+      // console.log("Tables:", data);
       setTables(data);
       
       // Calculate stats
       const uniqueCategories = [...new Set(data.map(table => table.category))];
-      const available = data.filter(table => table.status === 'available').length;
-      const booked = data.filter(table => table.status === 'booked').length;
+      const available = data.filter(table => table.status == true).length;
+      const booked = data.filter(table => table.status == false).length;
       
       setCategories(uniqueCategories);
       setStats({
         total: data.length,
-        available: available,
+        available: data.status,
+        // available: data.status.length,
         booked: booked,
         categories: uniqueCategories.length
       });
