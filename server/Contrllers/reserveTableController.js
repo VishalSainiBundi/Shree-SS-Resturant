@@ -1,5 +1,6 @@
 const { get } = require("mongoose")
 const reserveTableModel = require("../Models/reserveTableModel")
+const reserveModel = require("../Models/reservModel")
 
 const bookTable= async (req, res)=>{
     const data= req.body
@@ -50,4 +51,21 @@ const getBook = async (req, res)=>{
     }
 }
 
-module.exports = {bookTable, getBook}
+const status= async (req, res)=>{
+    try {
+    const tableData= await reserveModel.find()
+    return res.send({
+        tableData,
+        msg:"table data"
+    }
+    )
+    } catch (error) {
+        console.log(error)
+        return res.send({
+            msg:"Internal error",
+            flag:1
+        })
+    }
+}
+
+module.exports = {bookTable, getBook, status}

@@ -5,5 +5,6 @@ const bookReserveRoute= express.Router()
 
 bookReserveRoute.post('/create',bookTable)
 bookReserveRoute.get('/get',getBook)
+bookReserveRoute.patch('/status',getBook)
 
 module.exports = bookReserveRoute

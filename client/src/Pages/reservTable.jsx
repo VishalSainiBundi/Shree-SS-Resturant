@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import axiosApiInstance from "../../helper";
 import {
   Search,
@@ -24,9 +24,6 @@ import { useNavigate } from "react-router-dom";
 
 // Map category names to their respective icons and colors
 const getCategoryConfig = (category) => {
-
-const navigate= useNavigate()
-
   const configs = {
     "Royal Dining": {
       icon: Crown,
@@ -59,9 +56,9 @@ const navigate= useNavigate()
   return configs[category] || configs["Classic Dining"];
 };
 
-
 const BookTable = ({ table_data }) => {
-  console.log(table_data, "tableData");
+  const navigate = useNavigate();
+  const bookingFormRef = useRef(null); // Add ref for booking form
 
   // Transform API data into sections structure
   const buildSections = () => {
@@ -136,10 +133,20 @@ const BookTable = ({ table_data }) => {
     setSelectedTable(table);
     setBookingError("");
     setBookingSuccess("");
-    document.getElementById("booking-form").scrollIntoView({ 
-      behavior: "smooth",
-      block: "center",
-    });
+    
+    // Fix: Properly scroll to booking form with a small delay to ensure it renders
+    setTimeout(() => {
+      if (bookingFormRef.current) {
+        const formElement = bookingFormRef.current;
+        const formPosition = formElement.getBoundingClientRect().top + window.pageYOffset;
+        const offsetPosition = formPosition - 100; // 100px offset from top
+        
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth",
+        });
+      }
+    }, 100); // Small delay to ensure DOM update
   };
 
   const handleBookingSubmit = async (e) => {
@@ -173,7 +180,7 @@ const BookTable = ({ table_data }) => {
       console.log("Sending booking data:", bookingData);
 
       // Make API call using axios
-      const response = await axiosApiInstance.post ("/reserve/create", bookingData);
+      const response = await axiosApiInstance.post("/reserve/create", bookingData);
       
       console.log("Booking response:", response.data);
 
@@ -181,8 +188,8 @@ const BookTable = ({ table_data }) => {
       if (response.data.flag === 0) {
         // Success
         setBookingSuccess(`✅ Table ${selectedTable.tableNo} booked successfully!`);
-        navigate(`/reservation_sucess?${data= bookingData}`)
-        // alert(`✅ Table ${selectedTable?.tableNo} booked successfully!\n\nName: ${guestName}\nDate: ${bookingDate}\nTime: ${bookingTime}\nPrice: ₹${selectedTable?.price}`);
+        
+        navigate(`/reservation_sucess/${guestEmail}`);
         
         // Reset form
         setSelectedTable(null);
@@ -201,14 +208,10 @@ const BookTable = ({ table_data }) => {
       
       // Handle different types of errors
       if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
         setBookingError(error.response.data?.msg || `Server error: ${error.response.status}`);
       } else if (error.request) {
-        // The request was made but no response was received
         setBookingError("No response from server. Please check your connection.");
       } else {
-        // Something happened in setting up the request that triggered an Error
         setBookingError(error.message || "An unexpected error occurred.");
       }
     } finally {
@@ -360,7 +363,7 @@ const BookTable = ({ table_data }) => {
                 </div>
               </div>
 
-              {/* Table Cards */}
+              {/* Table Cards - REMOVED onClick from card */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredTables.map((table) => (
                   <div
@@ -483,7 +486,11 @@ const BookTable = ({ table_data }) => {
 
         {/* ===== BOOKING FORM ===== */}
         {selectedTable && (
-          <div id="booking-form" className="mt-16 max-w-2xl mx-auto animate-fadeIn">
+          <div 
+            ref={bookingFormRef} // Add ref here
+            id="booking-form" 
+            className="mt-16 max-w-2xl mx-auto animate-fadeIn"
+          >
             <div className="bg-white rounded-3xl shadow-3xl overflow-hidden border border-amber-100/50">
               {/* Form Header */}
               <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-6 text-white">
@@ -670,7 +677,7 @@ const BookTable = ({ table_data }) => {
       </div>
 
       {/* ===== CUSTOM ANIMATIONS ===== */}
-      <style jsx>{`
+      <style >{`
         @keyframes fadeIn {
           from {
             opacity: 0;
