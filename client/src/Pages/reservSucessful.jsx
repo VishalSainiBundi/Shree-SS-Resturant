@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
   FaCheckCircle,
   FaPhoneAlt,
@@ -12,8 +12,14 @@ import {
   FaClipboardList,
 } from "react-icons/fa";
 
-const ReservationSuccess = () => {
+const ReservationSuccess = ({reserv}) => {
   const { state } = useLocation();
+
+  const {data}= useSearchParams()
+
+console.log(data,'reservingData')
+
+// console.log(reserv,'reserveing')
 
   // Dummy Data (Replace with API data)
   const reservation = state || {

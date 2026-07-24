@@ -20,9 +20,13 @@ import {
   Heart,
   Loader2,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // Map category names to their respective icons and colors
 const getCategoryConfig = (category) => {
+
+const navigate= useNavigate()
+
   const configs = {
     "Royal Dining": {
       icon: Crown,
@@ -55,14 +59,6 @@ const getCategoryConfig = (category) => {
   return configs[category] || configs["Classic Dining"];
 };
 
-// Create axios instance with base configuration
-// const api = axios.create({
-//   baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000/api",
-//   headers: {
-//     "Content-Type": "application/json",
-//   },
-//   timeout: 10000, // 10 seconds timeout
-// });
 
 const BookTable = ({ table_data }) => {
   console.log(table_data, "tableData");
@@ -185,7 +181,8 @@ const BookTable = ({ table_data }) => {
       if (response.data.flag === 0) {
         // Success
         setBookingSuccess(`✅ Table ${selectedTable.tableNo} booked successfully!`);
-        alert(`✅ Table ${selectedTable?.tableNo} booked successfully!\n\nName: ${guestName}\nDate: ${bookingDate}\nTime: ${bookingTime}\nPrice: ₹${selectedTable?.price}`);
+        navigate(`/reservation_sucess?${data= bookingData}`)
+        // alert(`✅ Table ${selectedTable?.tableNo} booked successfully!\n\nName: ${guestName}\nDate: ${bookingDate}\nTime: ${bookingTime}\nPrice: ₹${selectedTable?.price}`);
         
         // Reset form
         setSelectedTable(null);

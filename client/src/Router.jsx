@@ -53,7 +53,7 @@ useEffect(
       {/* <Route path="/auth" element={<AuthPage />} /> */}
       <Route path="/order-confired" element={<OrderConfirmed />} />
       <Route path="/reservation" element={<BookTable table_data={table}/>} />
-      <Route path="/reservation_sucess/:id" element={<ReservationSuccess table_data={table}/>} />
+      <Route path="/reservation_sucess" element={<ReservationSuccess reserv={reserv}/>} />
       <Route path="/dishDetail/:id" element={<DishDetail  dishData={dish} category={category} />} />
     </Routes>
   );
