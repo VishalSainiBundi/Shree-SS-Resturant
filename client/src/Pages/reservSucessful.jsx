@@ -1,4 +1,5 @@
-import { Link, useLocation, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
 import {
   FaCheckCircle,
   FaPhoneAlt,
@@ -13,26 +14,123 @@ import {
   FaArrowLeft,
   FaPrint,
   FaShare,
+  FaTrashAlt,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
+import axiosApiInstance from "../../helper";
 
-const ReservationSuccess = ({ reserv = [] }) => {
+const ReservationSuccess = () => {
   const { state } = useLocation();
   const { email } = useParams();
+  const navigate = useNavigate();
 
-  const reservation =
-    state?.reservation ||
-    reserv.find(
-      (item) => item.email === decodeURIComponent(email)
+  const [reservation, setReservation] = useState(state?.reservation || null);
+  const [loading, setLoading] = useState(!state?.reservation);
+  const [error, setError] = useState("");
+  const [cancelling, setCancelling] = useState(false);
+
+useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+  }, []);
+  
+
+
+  // Only fetch from API if we didn't get data from router state
+  useEffect(() => {
+    if (state?.reservation) return;
+
+    const fetchReservation = async () => {
+      try {
+        setLoading(true);
+        const res = await axiosApiInstance.get("/reserve/get");
+        const all = res.data?.reserdata || [];
+        const found = all.find(
+          (item) => item.email === decodeURIComponent(email)
+        );
+        if (found) {
+          setReservation(found);
+        } else {
+          setError("Reservation not found for this email.");
+        }
+      } catch (err) {
+        console.error("Failed to fetch reservation:", err);
+        setError("Failed to load reservation details. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReservation();
+  }, [email, state]);
+
+  // ===== Cancel Reservation =====
+  const handleCancel = async () => {
+    if (!reservation) return;
+
+    const confirmCancel = window.confirm(
+      `Are you sure you want to cancel your reservation (ID: ${reservation._id})? This action cannot be undone.`
     );
+    if (!confirmCancel) return;
 
-  if (!reservation) {
+    try {
+      setCancelling(true);
+      const response = await axiosApiInstance.delete(
+        `/reserve/delete/${reservation._id}`
+      );
+      if (response.data.flag === 0) {
+        alert("✅ Reservation cancelled successfully.");
+        navigate("/");
+      } else {
+        alert(response.data.msg || "Failed to cancel reservation.");
+      }
+    } catch (error) {
+      console.error("Cancel error:", error);
+      alert(
+        error.response?.data?.msg || "An error occurred while cancelling."
+      );
+    } finally {
+      setCancelling(false);
+    }
+  };
+
+  // ===== Print =====
+  const handlePrint = () => {
+    window.print();
+  };
+
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-100 p-4 overflow-x-hidden">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-amber-600 mt-4">Loading Reservation...</h2>
-          <p className="text-gray-500 mt-2">Please wait while we fetch your reservation.</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-amber-600 mt-4">
+            Loading Reservation...
+          </h2>
+          <p className="text-gray-500 mt-2">
+            Please wait while we fetch your reservation.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !reservation) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-100 p-4">
+        <div className="text-center">
+          <p className="text-red-500 text-lg font-semibold">
+            {error || "Reservation not found."}
+          </p>
+          <Link
+            to="/"
+            className="mt-4 inline-block px-6 py-2 bg-amber-500 text-white rounded-xl font-semibold hover:bg-amber-600 transition"
+          >
+            Back to Home
+          </Link>
         </div>
       </div>
     );
@@ -164,7 +262,7 @@ const ReservationSuccess = ({ reserv = [] }) => {
                 </p>
                 <span className="inline-flex items-center gap-2 mt-2 bg-amber-500 text-white px-4 py-2 rounded-full font-bold shadow-lg shadow-amber-500/30 text-sm sm:text-base">
                   <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
-                  {reservation.status ? "Available" :"Reserved"|| "Pending Confirmation"}
+                  {reservation.status ? "Confirmed" : "Pending"}
                 </span>
               </motion.div>
 
@@ -205,21 +303,25 @@ const ReservationSuccess = ({ reserv = [] }) => {
             </motion.div>
 
             {/* ===== BUTTONS ===== */}
-            <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <div className="mt-8 sm:mt-10 flex flex-wrap gap-3 sm:gap-4">
               <Link
                 to="/"
-                className="w-full sm:flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white py-3.5 sm:py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-2xl flex items-center justify-center gap-2 group text-sm sm:text-base"
+                className="flex-1 min-w-[120px] bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white py-3.5 sm:py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-2xl flex items-center justify-center gap-2 group text-sm sm:text-base"
               >
                 <FaArrowLeft className="group-hover:-translate-x-1 transition-transform" />
                 Back to Home
               </Link>
+
+              {/* Print Button */}
               <button
-                onClick={() => window.print()}
-                className="w-full sm:flex-1 bg-white border-2 border-amber-200 hover:border-amber-400 text-amber-600 py-3.5 sm:py-4 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 hover:bg-amber-50 text-sm sm:text-base"
+                onClick={handlePrint}
+                className="flex-1 min-w-[120px] bg-white border-2 border-amber-200 hover:border-amber-400 text-amber-600 py-3.5 sm:py-4 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 hover:bg-amber-50 text-sm sm:text-base"
               >
                 <FaPrint />
-                Print Receipt
+                Print
               </button>
+
+              {/* Share Button */}
               <button
                 onClick={() => {
                   if (navigator.share) {
@@ -234,10 +336,29 @@ const ReservationSuccess = ({ reserv = [] }) => {
                     });
                   }
                 }}
-                className="w-full sm:flex-1 bg-white border-2 border-amber-200 hover:border-amber-400 text-amber-600 py-3.5 sm:py-4 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 hover:bg-amber-50 text-sm sm:text-base"
+                className="flex-1 min-w-[120px] bg-white border-2 border-amber-200 hover:border-amber-400 text-amber-600 py-3.5 sm:py-4 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 hover:bg-amber-50 text-sm sm:text-base"
               >
                 <FaShare />
                 Share
+              </button>
+
+              {/* Cancel Button */}
+              <button
+                onClick={handleCancel}
+                disabled={cancelling}
+                className="flex-1 min-w-[120px] bg-red-50 border-2 border-red-200 hover:border-red-400 text-red-600 py-3.5 sm:py-4 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 hover:bg-red-100 text-sm sm:text-base disabled:opacity-50"
+              >
+                {cancelling ? (
+                  <>
+                    <span className="animate-spin">⏳</span>
+                    Cancelling...
+                  </>
+                ) : (
+                  <>
+                    <FaTrashAlt />
+                    Cancel
+                  </>
+                )}
               </button>
             </div>
           </div>

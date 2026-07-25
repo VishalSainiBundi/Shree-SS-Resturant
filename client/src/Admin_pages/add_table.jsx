@@ -1,6 +1,7 @@
 import { useState } from "react";
 // import axiosApiInstance from "../../helper"; // Update path if needed
 import axios from 'axios'
+import axiosApiInstance from "../../helper";
 
 const AddTable = () => {
   const [formData, setFormData] = useState({
@@ -32,7 +33,8 @@ const AddTable = () => {
         price: Number(formData.price),
       };
 
-      const res = await axios.post("http://localhost:5000/add_table/create", payload);
+      // const res = await axios.post("http://localhost:5000/add_table/create", payload);
+      const res= await axiosApiInstance.post(`/add_table/create`, payload)
 
       if (res.data.flag === 0) {
         alert(res.data.msg);

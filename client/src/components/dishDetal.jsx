@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 // import axiosApiInstance from "../../helper";
 import axios from "axios"
+import axiosApiInstance from "../../helper";
 
 const DishDetail = ({ dishData, category }) => {
   const { id } = useParams();
@@ -64,8 +65,13 @@ const handleOrderNow = async () => {
     //   orderData
     // );
 
-    const response = await axios.post(
-      "http://localhost:5000/order/create",
+    // const response = await axios.post(
+    //   "http://localhost:5000/order/create",
+    //   orderData
+    // );
+
+    const response = await axiosApiInstance.post(
+      "/order/create",
       orderData
     );
 

@@ -17,12 +17,14 @@ const reservetableSchema = new mongoose.Schema(
     email: {
       type: String,
       trim: true,
+      unique:true,
       default: "",
     },
 
     tableNo: {
       type: String,
       required: true,
+      unique:true,
       trim: true,
     },
 
@@ -57,6 +59,7 @@ const reservetableSchema = new mongoose.Schema(
     bookingTime: {
       type: String,
       required: true,
+      unique:true,
     },
 
     // paymentStatus: {

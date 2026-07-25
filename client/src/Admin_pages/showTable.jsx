@@ -66,7 +66,9 @@ const AdminTables = () => {
   const handleDelete = async (id, tableNo) => {
     if (window.confirm(`Are you sure you want to delete Table "${tableNo}"?`)) {
       try {
-        await axios.delete(`http://localhost:5000/add_table/delete/${id}`);
+        // await axios.delete(`http://localhost:5000/add_table/delete/${id}`);
+        await axiosApiInstance.delete(`/add_table/delete/${id}`);
+
         alert('✅ Table deleted successfully!');
         fetchTables();
       } catch (error) {
@@ -80,9 +82,14 @@ const AdminTables = () => {
   const handleToggleStatus = async (id, currentStatus) => {
     const newStatus = currentStatus === 'available' ? 'booked' : 'available';
     try {
-      await axios.patch(`http://localhost:5000/add_table/update/${id}`, {
+      // await axios.patch(`http://localhost:5000/add_table/update/${id}`, {
+      //   status: newStatus
+      // });
+
+await axiosApiInstance.patch(`/add_table/update/${id}`, {
         status: newStatus
       });
+
       fetchTables();
     } catch (error) {
       console.error('Error updating table status:', error);
