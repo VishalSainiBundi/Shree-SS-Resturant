@@ -1,39 +1,28 @@
 const express = require("express");
-const { create, get, update, Delete, addAddress, updateAddress, deleteAddress, login } = require("../Contrllers/userController");
+const {
+  create, get, update, Delete,
+  addAddress, updateAddress, deleteAddress,
+  login, verifyOtp, resendOtp
+} = require("../Contrllers/userController");
+
 const userRouter = express.Router();
-
-
 
 // ==============================
 // USER ROUTES
 // ==============================
-
-// Create User
-userRouter.post("/create", create);
-
-
-userRouter.post("/login", login);
-
-// Get All Users
-userRouter.get("/get", get);
-
-// Update User
-userRouter.put("/update/:id", update);
-
-// Delete User
+userRouter.post("/create",       create);
+userRouter.post("/login",        login);
+userRouter.post("/verify-otp",   verifyOtp);
+userRouter.post("/resend-otp",   resendOtp);
+userRouter.get("/get",           get);
+userRouter.put("/update/:id",    update);
 userRouter.delete("/delete/:id", Delete);
 
 // ==============================
 // ADDRESS ROUTES
 // ==============================
-
-// Add Address
-userRouter.post("/address/add/:id", addAddress);
-
-// Update Address
-userRouter.put("/address/update/:userId/:addressId", updateAddress);
-
-// Delete Address
-userRouter.delete("/address/delete/:userId/:addressId", deleteAddress);
+userRouter.post("/address/add/:id",                      addAddress);
+userRouter.put("/address/update/:userId/:addressId",     updateAddress);
+userRouter.delete("/address/delete/:userId/:addressId",  deleteAddress);
 
 module.exports = userRouter;

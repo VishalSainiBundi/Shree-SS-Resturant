@@ -187,6 +187,8 @@ const BookTable = ({ table_data }) => {
       // Check if booking was successful
       if (response.data.flag === 0) {
         // Success
+
+        await axiosApiInstance.patch('/reserve/status')
         setBookingSuccess(`✅ Table ${selectedTable.tableNo} booked successfully!`);
         
         navigate(`/reservation_sucess/${guestEmail}`);

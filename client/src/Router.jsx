@@ -14,6 +14,8 @@ import BookTable from "./Pages/reservTable";
 import Get_Table from "../api_calls/getTable";
 import ReservationSuccess from "./Pages/reservSucessful";
 import get_Reserve from "../api_calls/getReserv";
+import axiosApiInstance from "../helper";
+import VerifyEmail from "./Pages/verifyEmail";
 
 
 const Page_Router =() => {
@@ -29,6 +31,8 @@ useEffect(
     const data= await Get_dish()
     const catdata= await GetMenu()
     const table_data= await Get_Table()
+        await axiosApiInstance.patch('/reserve/status')
+
     const reserve_data= await  get_Reserve()
     // console.log(reserve_data,"reservData")
     setreserve(reserve_data)
@@ -49,6 +53,7 @@ useEffect(
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/auth" element={<AuthPage />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/view/:id" element={<ViewCategoryDishes  dish={dish} category={category}/>} />
       {/* <Route path="/auth" element={<AuthPage />} /> */}
       <Route path="/order-confired" element={<OrderConfirmed />} />

@@ -26,8 +26,8 @@ const create= async (req, res)=>{
             res.send('Image is required',1)
             return
         }
-        else if(null!==same_dishName_data){
-            res.send({
+        else if(null !== same_dishName_data){
+            return res.send({
                 msg:"This dish are already exist",
                 flag:1
             })

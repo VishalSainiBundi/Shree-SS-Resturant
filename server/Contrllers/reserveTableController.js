@@ -4,6 +4,10 @@ const reserveModel = require("../Models/reservModel")
 
 const bookTable= async (req, res)=>{
     const data= req.body
+    console.log(data,"data")
+console.log(data.bookingTime,"time")
+console.log(data.bookingDate,"Date")
+
     try {
         
 const bookData= await reserveTableModel.create({
@@ -16,6 +20,8 @@ const bookData= await reserveTableModel.create({
     bookingDate:data.bookingDate,
     bookingTime:data.bookingTime,
     category:data.category
+    
+    
 })
 
 return res.send({
@@ -89,7 +95,22 @@ const status = async (req, res) => {
 };
 
 const Delete = async (req, res) =>{
+const {id} = req.params
+try {
+  
+await reserveTableModel.findByIdAndDelete(id)
+return res.send({
+  msg:'Cancilation Sucessfully',
+  flag:0
+})
 
+} catch (error) {
+  console.log(error)
+  return res.send({
+    msg:'Internal error',
+  flag:1}
+)
+}
 }
 
-module.exports = {bookTable, getBook, status}
+module.exports = {bookTable, getBook, status, Delete}

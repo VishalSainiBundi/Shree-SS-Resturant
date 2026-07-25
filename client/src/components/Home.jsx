@@ -212,7 +212,7 @@ export default function Home({ dish = [], category = [] }) {
   }, [category, hasCategories, itemsPerView, currentCategoryIndex]);
 
   return (
-    <div className="bg-white text-gray-800 antialiased font-sans overflow-hidden">
+    <div className="bg-white text-gray-800 antialiased font-sans overflow-hidden ">
 
       {/* ================= HERO SECTION ================= */}
       <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
