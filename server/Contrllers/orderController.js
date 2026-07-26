@@ -145,7 +145,6 @@ const get = async (req, res) => {
   }
 };
 
-const OrderModel = require("../models/orderModel");
 
 // ===== DELETE ORDER =====
 const Delete = async (req, res) => {
