@@ -233,7 +233,7 @@ const AdminSidebar = ({ isSidebarOpen = true, onToggle }) => {
             <div className="absolute top-0 right-0 w-20 h-20 bg-amber-200/20 rounded-full blur-2xl"></div>
             <div className="absolute bottom-0 left-0 w-16 h-16 bg-amber-300/10 rounded-full blur-2xl"></div>
             
-            <div className="relative flex items-center gap-3 mb-3">
+            {/* <div className="relative flex items-center gap-3 mb-3">
               <div className="relative">
                 <div className="absolute inset-0 bg-amber-400/20 rounded-xl blur-md"></div>
                 <div className="relative w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-700 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30">
@@ -244,9 +244,9 @@ const AdminSidebar = ({ isSidebarOpen = true, onToggle }) => {
                 <h3 className="font-serif font-bold text-amber-800 text-lg leading-tight">SHREE SS</h3>
                 <p className="text-xs text-amber-600/70 tracking-wider">Premium Dining</p>
               </div>
-            </div>
+            </div> */}
             
-            <p className="relative text-sm text-amber-700/80 leading-relaxed font-light italic">
+            {/* <p className="relative text-sm text-amber-700/80 leading-relaxed font-light italic">
               <i className="fas fa-heart text-amber-400 mr-1"></i>
               "Taste that stays in your heart"
             </p>
@@ -258,7 +258,7 @@ const AdminSidebar = ({ isSidebarOpen = true, onToggle }) => {
               </span>
               <span>✦</span>
               <span>© {new Date().getFullYear()}</span>
-            </div>
+            </div> */}
           </div>
         </div>
       )}

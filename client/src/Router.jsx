@@ -25,13 +25,26 @@ const [category, setcategory]= useState([])
 const [table, settable] =useState([])
 const [reserv, setreserve] =useState([])
 
+
+useEffect(() => {
+  const updateReservationStatus = async () => {
+    try {
+      await axiosApiInstance.patch("/reserve/status");
+      console.log("Reservation status updated");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  updateReservationStatus();
+}, []);
+
 useEffect(
   ()=>{
    const fetchDish=async ()=>{
     const data= await Get_dish()
     const catdata= await GetMenu()
     const table_data= await Get_Table()
-        await axiosApiInstance.patch('/reserve/status')
 
     const reserve_data= await  get_Reserve()
     // console.log(reserve_data,"reservData")

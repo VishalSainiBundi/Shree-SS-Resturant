@@ -145,33 +145,40 @@ const get = async (req, res) => {
   }
 };
 
+const OrderModel = require("../models/orderModel");
+
+// ===== DELETE ORDER =====
 const Delete = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // Find and delete the order
     const order = await OrderModel.findByIdAndDelete(id);
 
+    // If order not found, return 404 with flag:1
     if (!order) {
       return res.status(404).json({
-        success: false,
-        message: "Order not found",
+        flag: 1,
+        msg: "Order not found",
       });
     }
 
+    // Success response – flag:0 indicates success
     return res.status(200).json({
-      success: true,
-      message: "Order deleted successfully",
+      flag: 0,
+      msg: "Order deleted successfully",
+      data: order,
     });
   } catch (error) {
-    console.log("❌ Delete Order Error:", error);
-
+    console.error("❌ Delete Order Error:", error);
     return res.status(500).json({
-      success: false,
-      message: error.message,
+      flag: 1,
+      msg: error.message || "Failed to delete order",
     });
   }
 };
 
+module.exports = { Delete };
 module.exports = {
   create,
   get,

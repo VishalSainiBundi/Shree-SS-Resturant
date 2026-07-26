@@ -1,41 +1,54 @@
 const { get } = require("mongoose")
 const reserveTableModel = require("../Models/reserveTableModel")
 const reserveModel = require("../Models/reservModel")
+const { Send_booking } = require("../middleware/Email")
+
 
 const bookTable= async (req, res)=>{
     const data= req.body
-    console.log(data,"data")
-console.log(data.bookingTime,"time")
-console.log(data.bookingDate,"Date")
+
+    console.log("📥 Booking request received:", JSON.stringify(data, null, 2))
+    console.log("📧 Customer email:", data.email)
+    console.log("📅 bookingDate:", data.bookingDate)
+    console.log("⏰ bookingTime:", data.bookingTime)
 
     try {
-        
-const bookData= await reserveTableModel.create({
-    customerName:data.customerName,
-    phone:data.phone,
-    email:data.email,
-    tableNo:data.tableNo,
-    price:data.price,
-    capecity:data.capecity,
-    bookingDate:data.bookingDate,
-    bookingTime:data.bookingTime,
-    category:data.category
-    
-    
-})
 
-return res.send({
-    bookData,
-    msg:"Reserve your table sucessfully",
-    flag:0
-})
+        const bookData = await reserveTableModel.create({
+            customerName: data.customerName,
+            phone:        data.phone,
+            email:        data.email,
+            tableNo:      data.tableNo,
+            price:        data.price,
+            capecity:     data.capecity,
+            bookingDate:  data.bookingDate,
+            bookingTime:  data.bookingTime,
+            category:     data.category
+        })
 
+        console.log("✅ Booking saved to DB — ID:", bookData._id)
+        console.log("📧 Email field in saved doc:", bookData.email)
+
+        if (!bookData.email) {
+            console.error("❌ bookData.email is missing — email was not saved. Check the request payload.")
+        } else {
+            console.log("📨 Calling Send_booking for:", bookData.email)
+            await Send_booking(bookData)
+            console.log("✅ Booking confirmation email sent to:", bookData.email)
+        }
+
+        return res.send({
+            bookData,
+            msg: "Reserve your table sucessfully",
+            flag: 0
+        })
 
     } catch (error) {
-        console.log(error)
+        console.error("❌ bookTable error:", error.message)
+        console.error(error)
         return res.send({
-            msg:'internal error ',
-            flag:1
+            msg: 'internal error',
+            flag: 1
         })
     }
 }

@@ -138,7 +138,7 @@ reservetableSchema.pre("save", async function () {
 
   bookingDateTime.setHours(hours, minutes, 0, 0);
 
-  this.expiresAt = new Date(bookingDateTime.getTime() + 1 * 60 * 1000);
+  this.expiresAt = new Date(bookingDateTime.getTime() +2 * 60*  60 * 1000);
 
   console.log("✅ expiresAt calculated:", this.expiresAt);
 });
