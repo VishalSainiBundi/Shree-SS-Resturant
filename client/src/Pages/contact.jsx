@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import axiosApiInstance from '../../helper'
 
 const Contact=()=> {
   const [formData, setFormData] = useState({
@@ -15,13 +14,10 @@ const Contact=()=> {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submissio
-    // console.log('Form submitted:', formData);
-
-await axiosApiInstance.post(`/contact/create`, formData)
-
+    // Handle form submission
+    console.log('Form submitted:', formData);
     alert('Thank you for your message! We will get back to you soon.');
   };
 
