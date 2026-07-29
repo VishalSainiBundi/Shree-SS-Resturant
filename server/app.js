@@ -45,7 +45,7 @@ app.use("/menu", menuRoute);
 app.use("/order", OrderRoute);
 app.use("/add_table", reserveRoute);
 app.use("/reserve", bookReserveRoute);
-// app.use("/contact", contactRoute);
+app.use("/contact", contactRoute);
 
 
 // Global error handler - must come after all routes
