@@ -1,29 +1,29 @@
-// const mongoose= require('mongoose')
+const mongoose= require('mongoose')
 
-// const contactSchema= mongoose.Schema({
-//     fullName:{
-//         type:String,
-//         required:true
-//     },
-//     email:{
-//         type:String,
-//         required:true
-//     },
-//     phone:{
-//         type:Number,
-//         required:true
-//     },
-//     subject:{
-//         type:String,
-//         required:true
-//     },
-//     message:{
-//         type:String,
-//         required:true
-//     }
-// },{
-//     timeStramp:true
-// })
+const contactSchema= mongoose.Schema({
+    fullName:{
+        type:String,
+        required:true
+    },
+    email:{
+        type:String,
+        required:true
+    },
+    phone:{
+        type:Number,
+        required:true
+    },
+    subject:{
+        type:String,
+        required:true
+    },
+    message:{
+        type:String,
+        required:true
+    }
+},{
+    timeStramp:true
+})
 
-// const contactModel= mongoose.model('contact', contactSchema)
-// module.exports= contactModel
+const contactModel= mongoose.model('contact', contactSchema)
+module.exports= contactModel

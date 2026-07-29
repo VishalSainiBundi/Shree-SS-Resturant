@@ -11,7 +11,7 @@ const menuRoute = require("./Routes/menuRoute");
 const OrderRoute = require("./Routes/orderRoute");
 const reserveRoute = require("./Routes/reserveRoute");
 const bookReserveRoute = require("./Routes/bookReserveRoute");
-// const contactRoute = require("./Routes/contactRoute");
+const contactRoute = require("./Routes/contactRoute");
 
 const app = express();
 
