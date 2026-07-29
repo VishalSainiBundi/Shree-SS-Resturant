@@ -4,6 +4,8 @@ const create= async(req, res)=>{
     const data = req.body
 
 try {
+
+    
       const contact=  contactModel.create({
         fullName:data.fullName,
         email:data.email,
