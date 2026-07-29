@@ -16,6 +16,7 @@ import ReservationSuccess from "./Pages/reservSucessful";
 import get_Reserve from "../api_calls/getReserv";
 import axiosApiInstance from "../helper";
 import VerifyEmail from "./Pages/verifyEmail";
+import getUser from "../api_calls/getUser";
 
 
 const Page_Router =() => {
@@ -24,6 +25,7 @@ const [dish, setdish]= useState([])
 const [category, setcategory]= useState([])
 const [table, settable] =useState([])
 const [reserv, setreserve] =useState([])
+const [user, setuser] =useState([])
 
 
 useEffect(() => {
@@ -45,13 +47,16 @@ useEffect(
     const data= await Get_dish()
     const catdata= await GetMenu()
     const table_data= await Get_Table()
+    const UserData= await getUser()
 
     const reserve_data= await  get_Reserve()
-    // console.log(reserve_data,"reservData")
+  
+    // console.log(user,"userdata")
     setreserve(reserve_data)
     settable(table_data)
     setcategory(catdata.data)
     setdish(data.data)
+    setuser(UserData)
    }
    fetchDish()
   },[]
@@ -65,10 +70,9 @@ useEffect(
       <Route path="/gallery" element={<Gallery />} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
-      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/auth" element={<AuthPage  users={user}/>} />
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/view/:id" element={<ViewCategoryDishes  dish={dish} category={category}/>} />
-      {/* <Route path="/auth" element={<AuthPage />} /> */}
       <Route path="/order-confired" element={<OrderConfirmed />} />
       <Route path="/reservation" element={<BookTable table_data={table}/>} />
       <Route path="/reservation_sucess/:email" element={<ReservationSuccess />} />

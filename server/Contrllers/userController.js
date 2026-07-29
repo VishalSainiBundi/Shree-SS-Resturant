@@ -1,6 +1,6 @@
-const Send_VerifyCode = require("../middleware/Email");
-const userModel = require("../Models/userModel");
 
+const userModel = require("../Models/userModel");
+const {Send_VerifyCode} =require('../middleware/Email')
 // =======================
 // REGISTER / CREATE USER
 // =======================

@@ -22,6 +22,7 @@ import {
   X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 // Map category names to their respective icons and colors
 const getCategoryConfig = (category) => {
@@ -66,6 +67,11 @@ const getCategoryConfig = (category) => {
 const BookTable = ({ table_data }) => {
   const navigate = useNavigate();
   const bookingFormRef = useRef(null);
+
+  const user = useSelector(
+    (state)=> state.userStore.user.payload
+  )
+  // console.log(user,"userReduxTable")
 
   // Transform API data into sections structure
   const buildSections = () => {
@@ -177,19 +183,23 @@ const BookTable = ({ table_data }) => {
         specialRequest: specialRequest,
       };
 
-      console.log("Sending booking data:", bookingData);
+      // console.log("Sending booking data:", bookingData);
+let response
 
-      const response = await axiosApiInstance.post("/reserve/create", bookingData);
+      if(user){
+      response = await axiosApiInstance.post("/reserve/create", bookingData);
 
-      console.log("Booking response:", response.data);
+      }else{
+        navigate('/auth')
+        return alert('Please login')
+      }
+
+
+      // console.log("Booking response:", response.data);
 
       if (response.data.flag === 0) {
         await axiosApiInstance.patch("/reserve/status");
         setBookingSuccess(`✅ Table ${selectedTable.tableNo} booked successfully!`);
-        // Pass the saved booking directly — success page uses it instantly, no API call needed
-        navigate(`/reservation_sucess/${guestEmail}`, {
-          state: { reservation: response.data.bookData },
-        });
         setSelectedTable(null);
         setGuestName("");
         setGuestPhone("");
@@ -197,6 +207,9 @@ const BookTable = ({ table_data }) => {
         setBookingDate("");
         setBookingTime("");
         setSpecialRequest("");
+        navigate(`/reservation_sucess/${guestEmail}`, {
+          state: { reservation: response.data.bookData },
+        });
       } else {
         setBookingError(response.data.msg || "Booking failed. Please try again.");
       }

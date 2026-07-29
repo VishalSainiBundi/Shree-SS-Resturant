@@ -3,11 +3,18 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 // import axiosApiInstance from "../../helper";
 import axios from "axios"
 import axiosApiInstance from "../../helper";
+import { useSelector } from "react-redux";
 
 const DishDetail = ({ dishData, category }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   
+const user = useSelector(
+  (state)=> state.userStore.user.payload
+)
+
+// console.log(user,"Redux")
+
   // Find dish by ID
   const dish = dishData?.find((d) => d._id === id);
   // console.log(dish,"Detail_Dish")
@@ -70,10 +77,19 @@ const handleOrderNow = async () => {
     //   orderData
     // );
 
-    const response = await axiosApiInstance.post(
+let response
+
+    if(user){
+response = await axiosApiInstance.post(
       "/order/create",
       orderData
     );
+    }
+    else{
+      navigate('/auth')
+    }
+
+   
 
 
 

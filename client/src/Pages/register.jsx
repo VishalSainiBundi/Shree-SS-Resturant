@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axiosApiInstance from "../../helper";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../Redux/userSlice";
 
 function AuthPage() {
   const navigate = useNavigate();
@@ -9,6 +11,9 @@ function AuthPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.userStore.user);
 
   // Login form state
   const [loginData, setLoginData] = useState({
@@ -56,14 +61,42 @@ function AuthPage() {
     setLoading(true);
     try {
       const response = await axiosApiInstance.post("/user/login", loginData);
-      if (response.data.flag === 0) {
-        setSuccess("Login successful! Redirecting...");
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("userName", response.data.user?.name || "User");
-        localStorage.setItem("userEmail", response.data.user?.email || loginData.email);
+      console.log("Login response:", response.data);
+
+      // Check if login was successful (flag === 0 means success)
+      if (response.data.flag !== 0) {
+        setError(response.data.msg || "Login failed. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      // Extract token and user from response
+      const { token, user } = response.data;
+
+      // Store in localStorage
+      localStorage.setItem("token", token);
+      localStorage.setItem("userName", user?.name || "User");
+      localStorage.setItem("userEmail", user?.email || loginData.email);
+      // Also store the user object for later use
+      localStorage.setItem("user", JSON.stringify(user));
+
+      // Dispatch login action to Redux
+      dispatch(login(user));
+
+      setSuccess("Login successful! Redirecting...");
+
+      // Determine redirect based on verification status
+      if (user.isVerified === true) {
+        // Verified user -> go to home
         setTimeout(() => navigate("/"), 1500);
       } else {
-        setError(response.data.msg || "Login failed. Please try again.");
+        // Not verified -> go to verification page with email
+        // Store email in sessionStorage as fallback
+        sessionStorage.setItem("verify_email", user.email);
+        navigate("/verify-email", {
+          state: { email: user.email },
+          replace: true, // prevents back button issues
+        });
       }
     } catch (err) {
       console.error(err);
@@ -109,6 +142,7 @@ function AuthPage() {
 
       if (response.data.flag === 0) {
         setSuccess("Account created! Redirecting to email verification...");
+        // Clear register form
         setRegisterData({
           name: "",
           email: "",
@@ -116,18 +150,18 @@ function AuthPage() {
           password: "",
           confirmPassword: "",
         });
-        // Persist email to sessionStorage so verify page survives a refresh
+        // Persist email for verification page (fallback)
         sessionStorage.setItem("verify_email", email);
-        // Navigate to verify page and pass email via router state
-        setTimeout(() => {
-          navigate("/verify-email", { state: { email } });
-        }, 1500);
+        // Navigate to verify page with email state
+        navigate("/verify-email", {
+          state: { email },
+          replace: true,
+        });
       } else {
         setError(response.data.message || "Registration failed. Please try again.");
       }
     } catch (err) {
       console.error(err);
-      // 409 = duplicate email/phone
       const msg = err.response?.data?.message || "Something went wrong. Please try again.";
       setError(msg);
     } finally {
@@ -156,7 +190,6 @@ function AuthPage() {
   return (
     <div className="min-h-screen bg-[url('/bg_1.png')] bg-cover bg-center flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-6 sm:p-8">
-
         {/* Logo & Brand */}
         <div className="text-center mb-8">
           <img
@@ -208,7 +241,7 @@ function AuthPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
+                className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
               >
                 {showPassword ? "🙈" : "👁️"}
               </button>
@@ -217,7 +250,7 @@ function AuthPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 flex items-center justify-center gap-2"
+              className="cursor-pointer w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -271,7 +304,7 @@ function AuthPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
+                className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
               >
                 {showPassword ? "🙈" : "👁️"}
               </button>
@@ -289,7 +322,7 @@ function AuthPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 flex items-center justify-center gap-2"
+              className="cursor-pointer w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -306,7 +339,7 @@ function AuthPage() {
         <div className="text-center mt-6">
           <button
             onClick={toggleAuth}
-            className="text-yellow-400 hover:text-yellow-300 transition text-sm"
+            className="cursor-pointer text-yellow-400 hover:text-yellow-300 transition text-sm"
           >
             {isLogin
               ? "Don't have an account? Register"

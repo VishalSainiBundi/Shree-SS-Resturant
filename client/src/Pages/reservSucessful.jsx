@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import {
   FaCheckCircle,
   FaPhoneAlt,
@@ -14,124 +13,33 @@ import {
   FaArrowLeft,
   FaPrint,
   FaShare,
-  FaTrashAlt,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
 import axiosApiInstance from "../../helper";
-import { Phone, Clock } from "lucide-react";
 
-const ReservationSuccess = () => {
+const ReservationSuccess = ({ reserv = [] }) => {
   const { state } = useLocation();
   const { email } = useParams();
-  const navigate = useNavigate();
 
-  const [reservation, setReservation] = useState(state?.reservation || null);
-  const [loading, setLoading] = useState(!state?.reservation);
-  const [error, setError] = useState("");
-  const [cancelling, setCancelling] = useState(false);
-
-useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "smooth",
-    });
-  }, []);
-  
-
-
-  // Only fetch from API if we didn't get data from router state
-  useEffect(() => {
-    if (state?.reservation) return;
-
-    const fetchReservation = async () => {
-      try {
-        setLoading(true);
-        const res = await axiosApiInstance.get("/reserve/get");
-        const all = res.data?.reserdata || [];
-        const found = all.find(
-          (item) => item.email === decodeURIComponent(email)
-        );
-        if (found) {
-          setReservation(found);
-        } else {
-          setError("Reservation not found for this email.");
-        }
-      } catch (err) {
-        console.error("Failed to fetch reservation:", err);
-        setError("Failed to load reservation details. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchReservation();
-  }, [email, state]);
-
-  // ===== Cancel Reservation =====
-  const handleCancel = async () => {
-    if (!reservation) return;
-
-    const confirmCancel = window.confirm(
-      `Are you sure you want to cancel your reservation (ID: ${reservation._id})? This action cannot be undone.`
+  const reservation =
+    state?.reservation ||
+    reserv.find(
+      (item) => item.email === decodeURIComponent(email)
     );
-    if (!confirmCancel) return;
 
-    try {
-      setCancelling(true);
-      const response = await axiosApiInstance.delete(
-        `/reserve/delete/${reservation._id}`
-      );
-      if (response.data.flag === 0) {
-        alert("✅ Reservation cancelled successfully.");
-        navigate("/");
-      } else {
-        alert(response.data.msg || "Failed to cancel reservation.");
-      }
-    } catch (error) {
-      console.error("Cancel error:", error);
-      alert(
-        error.response?.data?.msg || "An error occurred while cancelling."
-      );
-    } finally {
-      setCancelling(false);
-    }
-  };
+const cancelation= async ()=>{
 
-  // ===== Print =====
-  const handlePrint = () => {
-    window.print();
-  };
+  await axiosApiInstance.delete('/')
 
-  if (loading) {
+}
+
+  if (!reservation) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-100 p-4 overflow-x-hidden">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-amber-600 mt-4">
-            Loading Reservation...
-          </h2>
-          <p className="text-gray-500 mt-2">
-            Please wait while we fetch your reservation.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !reservation) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-100 p-4">
-        <div className="text-center">
-          <p className="text-red-500 text-lg font-semibold">
-            {error || "Reservation not found."}
-          </p>
-          <Link
-            to="/"
-            className="mt-4 inline-block px-6 py-2 bg-amber-500 text-white rounded-xl font-semibold hover:bg-amber-600 transition"
-          >
-            Back to Home
-          </Link>
+          <h2 className="text-2xl sm:text-3xl font-bold text-amber-600 mt-4">Loading Reservation...</h2>
+          <p className="text-gray-500 mt-2">Please wait while we fetch your reservation.</p>
         </div>
       </div>
     );
@@ -263,7 +171,7 @@ useEffect(() => {
                 </p>
                 <span className="inline-flex items-center gap-2 mt-2 bg-amber-500 text-white px-4 py-2 rounded-full font-bold shadow-lg shadow-amber-500/30 text-sm sm:text-base">
                   <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
-                  {reservation.status ? "Confirmed" : "Pending"}
+                  {reservation.status ? "Available" :"Reserved"|| "Pending Confirmation"}
                 </span>
               </motion.div>
 
@@ -290,80 +198,29 @@ useEffect(() => {
               transition={{ delay: 0.6 }}
               className="mt-6 sm:mt-8 bg-gradient-to-r from-orange-100/50 to-amber-100/50 rounded-2xl p-4 sm:p-5 border border-orange-200/50"
             >
-              <div className="flex flex-col md:flex-row items-center gap-6 bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-2xl transition-all duration-300">
-  {/* Receptionist Image */}
-  <div className="flex-shrink-0">
-    <img
-      src="/resption.png"
-      alt="Receptionist"
-      className="w-52 sm:w-64 md:w-72 lg:w-80 h-auto object-cover rounded-2xl"
-    />
-  </div>
-
-  {/* Contact Details */}
-  <div className="text-center md:text-left">
-    <span className="inline-flex items-center gap-2 bg-amber-100 text-amber-700 px-4 py-2 rounded-full text-sm font-semibold mb-4">
-      🕘 Support Hours: 9:00 AM – 10:00 PM
-    </span>
-
-    <h3 className="text-2xl font-bold text-gray-800 mb-3">
-      Need Assistance?
-    </h3>
-
-    <p className="text-gray-600 leading-relaxed mb-5">
-      Our reception team is available every day from
-      <span className="font-semibold text-gray-800"> 9:00 AM to 10:00 PM </span>
-      to help with table reservations, booking updates, special requests, and
-      any questions you may have.
-    </p>
-
-    <div className="flex flex-col sm:flex-row items-center gap-4">
-  {/* Call Button */}
-  <a
-    href="tel:+919876543210"
-    className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-  >
-    <Phone size={20} />
-    Call Now
-  </a>
-
-  {/* Support Hours */}
-  {/* <div className="flex items-center gap-2 text-gray-600">
-    <Clock size={18} className="text-amber-500" />
-    <span className="text-sm font-medium">
-      Available: <span className="font-semibold text-gray-800">9:00 AM – 10:00 PM</span>
-    </span>
-  </div> */}
-</div>
-
-    <p className="mt-4 text-sm text-gray-500">
-      <strong>Note:</strong> Calls are answered only between
-      <span className="font-semibold text-amber-600"> 9:00 AM and 10:00 PM</span>.
-    </p>
-  </div>
-</div>
+              <div className="flex flex-col xs:flex-row items-center gap-3 sm:gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center text-white shadow-lg shadow-amber-500/30 flex-shrink-0">
+                  <FaPhoneAlt className="text-base sm:text-xl" />
+                </div>
+                <div className="text-center xs:text-left">
+                  <h3 className="font-semibold text-gray-800 text-sm sm:text-base">Need Help?</h3>
+                  <p className="text-gray-600 text-sm sm:text-base">
+                    Call us at <span className="font-bold text-amber-600">+91 98765 43210</span>
+                  </p>
+                </div>
+              </div>
             </motion.div>
 
             {/* ===== BUTTONS ===== */}
-            <div className="mt-8 sm:mt-10 flex flex-wrap gap-3 sm:gap-4">
+            <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Link
                 to="/"
-                className="flex-1 min-w-[120px] bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white py-3.5 sm:py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-2xl flex items-center justify-center gap-2 group text-sm sm:text-base"
+                className="w-full sm:flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white py-3.5 sm:py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-2xl flex items-center justify-center gap-2 group text-sm sm:text-base"
               >
                 <FaArrowLeft className="group-hover:-translate-x-1 transition-transform" />
                 Back to Home
               </Link>
-
-              {/* Print Button */}
-              <button
-                onClick={handlePrint}
-                className="flex-1 min-w-[120px] bg-white border-2 border-amber-200 hover:border-amber-400 text-amber-600 py-3.5 sm:py-4 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 hover:bg-amber-50 text-sm sm:text-base"
-              >
-                <FaPrint />
-                Print
-              </button>
-
-              {/* Share Button */}
+             
               <button
                 onClick={() => {
                   if (navigator.share) {
@@ -378,30 +235,16 @@ useEffect(() => {
                     });
                   }
                 }}
-                className="flex-1 min-w-[120px] bg-white border-2 border-amber-200 hover:border-amber-400 text-amber-600 py-3.5 sm:py-4 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 hover:bg-amber-50 text-sm sm:text-base"
+                className="w-full sm:flex-1 bg-white border-2 border-amber-200 hover:border-amber-400 text-amber-600 py-3.5 sm:py-4 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 hover:bg-amber-50 text-sm sm:text-base"
               >
                 <FaShare />
                 Share
               </button>
 
-              {/* Cancel Button */}
-              <button
-                onClick={handleCancel}
-                disabled={cancelling}
-                className="flex-1 min-w-[120px] bg-red-50 border-2 border-red-200 hover:border-red-400 text-red-600 py-3.5 sm:py-4 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 hover:bg-red-100 text-sm sm:text-base disabled:opacity-50"
-              >
-                {cancelling ? (
-                  <>
-                    <span className="animate-spin">⏳</span>
-                    Cancelling...
-                  </>
-                ) : (
-                  <>
-                    <FaTrashAlt />
-                    Cancel
-                  </>
-                )}
-              </button>
+<button>
+
+</button>
+
             </div>
           </div>
         </motion.div>
