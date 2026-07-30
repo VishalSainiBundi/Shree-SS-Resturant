@@ -1,19 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axiosApiInstance from '../../helper';
 import { 
-  Plus, 
   Table, 
+  CheckCircle, 
   Users, 
-  IndianRupee,
-  Edit,
-  Trash2,
-  CheckCircle,
-  XCircle,
-  Search,
-  Filter
+  Filter, 
+  Search, 
+  IndianRupee, 
+  Edit, 
+  Trash2, 
+  Plus,
+  Crown,
+  BriefcaseBusiness,
+  UtensilsCrossed
 } from 'lucide-react';
-import axios from 'axios';
+import axiosApiInstance from '../../helper';
 
 const AdminTables = () => {
   const [tables, setTables] = useState([]);
@@ -38,20 +39,18 @@ const AdminTables = () => {
     try {
       const response = await axiosApiInstance.get('/add_table/get');
       const data = response.data?.data || response.data || [];
-      // console.log("Tables:", data);
       setTables(data);
       
       // Calculate stats
       const uniqueCategories = [...new Set(data.map(table => table.category))];
-      const available = data.filter(table => table.status == true).length;
-      const booked = data.filter(table => table.status == false).length;
-      
+      const available = data.filter(table => table.status === true).length;
+      const booked = data.filter(table => table.status === false).length;
+
       setCategories(uniqueCategories);
       setStats({
         total: data.length,
-        available: data.status,
-        // available: data.status.length,
-        booked: booked,
+        available,
+        booked,
         categories: uniqueCategories.length
       });
     } catch (error) {
@@ -62,15 +61,18 @@ const AdminTables = () => {
     }
   };
 
-  // Handle delete
+  // Handle delete — optimistic UI update, no extra API round-trip
   const handleDelete = async (id, tableNo) => {
     if (window.confirm(`Are you sure you want to delete Table "${tableNo}"?`)) {
       try {
-        // await axios.delete(`http://localhost:5000/add_table/delete/${id}`);
-        await axiosApiInstance.delete(`/add_table/delete/${id}`);
-
-        alert('✅ Table deleted successfully!');
-        fetchTables();
+        // const res = await axiosApiInstance.delete(`/add_table/delete/${id}`);
+        const res = await axiosApiInstance.delete(`http://localhost:5000/add_table/delete/${id}`);
+        if (res.data.flag === 0) {
+          // Remove from local state immediately — no refetch needed
+          setTables(prev => prev.filter(t => t._id !== id));
+        } else {
+          alert(res.data.msg || 'Failed to delete table.');
+        }
       } catch (error) {
         console.error('Error deleting table:', error);
         alert('Failed to delete table. Please try again.');
@@ -78,19 +80,17 @@ const AdminTables = () => {
     }
   };
 
-  // Handle status toggle
+  // Handle status toggle — status is Boolean: true=available, false=booked
   const handleToggleStatus = async (id, currentStatus) => {
-    const newStatus = currentStatus === 'available' ? 'booked' : 'available';
+    const newStatus = !currentStatus;
     try {
-      // await axios.patch(`http://localhost:5000/add_table/update/${id}`, {
-      //   status: newStatus
-      // });
-
-await axiosApiInstance.patch(`/add_table/update/${id}`, {
-        status: newStatus
-      });
-
-      fetchTables();
+      const res = await axiosApiInstance.patch(`/add_table/update/${id}`, { status: newStatus });
+      if (res.data.flag === 0) {
+        // Optimistic update — flip status in local state
+        setTables(prev =>
+          prev.map(t => t._id === id ? { ...t, status: newStatus } : t)
+        );
+      }
     } catch (error) {
       console.error('Error updating table status:', error);
       alert('Failed to update table status.');
@@ -108,11 +108,11 @@ await axiosApiInstance.patch(`/add_table/update/${id}`, {
   // Get category icon
   const getCategoryIcon = (category) => {
     const icons = {
-      'Royal Dining': '👑',
-      'Business Dining': '💼',
-      'Classic Dining': '🍽️'
+      'Royal Dining': <Crown size={24} className="text-amber-400" />,
+      'Business Dining': <BriefcaseBusiness size={24} className="text-blue-400" />,
+      'Classic Dining': <UtensilsCrossed size={24} className="text-emerald-400" />
     };
-    return icons[category] || '🪑';
+    return icons[category] || <UtensilsCrossed size={24} className="text-amber-400" />;
   };
 
   // Get category color
@@ -125,9 +125,9 @@ await axiosApiInstance.patch(`/add_table/update/${id}`, {
     return colors[category] || 'from-amber-500 to-amber-600';
   };
 
-  // Get status badge color
+  // Get status badge — status is Boolean: true=available, false=booked
   const getStatusBadge = (status) => {
-    if (status === 'available') {
+    if (status === true) {
       return {
         bg: 'bg-emerald-100/80',
         text: 'text-emerald-700',
@@ -147,7 +147,7 @@ await axiosApiInstance.patch(`/add_table/update/${id}`, {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream-50 via-white to-amber-50/30 p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50/30 via-white to-amber-50/30 p-6 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-amber-200/20 rounded-full blur-3xl"></div>
@@ -155,7 +155,7 @@ await axiosApiInstance.patch(`/add_table/update/${id}`, {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-100/10 rounded-full blur-3xl"></div>
       </div>
 
-      {/* Floating cream particles */}
+      {/* Floating particles */}
       <div className="absolute inset-0 pointer-events-none">
         {[...Array(15)].map((_, i) => (
           <div
@@ -406,13 +406,13 @@ await axiosApiInstance.patch(`/add_table/update/${id}`, {
                         <button
                           onClick={() => handleToggleStatus(table._id, table.status)}
                           className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
-                            table.status === 'available'
+                            table.status === true
                               ? 'bg-emerald-100/80 text-emerald-700 hover:bg-emerald-200/80 border border-emerald-200/50'
                               : 'bg-rose-100/80 text-rose-700 hover:bg-rose-200/80 border border-rose-200/50'
                           }`}
                         >
-                          <i className={`${table.status === 'available' ? 'fas' : 'far'} fa-circle mr-1`}></i>
-                          {table.status === 'available' ? 'Book Table' : 'Make Available'}
+                          <i className={`${table.status === true ? 'fas' : 'far'} fa-circle mr-1`}></i>
+                          {table.status === true ? 'Mark Booked' : 'Mark Available'}
                         </button>
                         <Link
                           to={`/admin/edit-table/${table._id}`}

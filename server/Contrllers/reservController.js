@@ -43,5 +43,33 @@ try {
 
 
 
-module.exports= {create, get}
+const Delete = async (req, res) => {
+  const { id } = req.params
+  try {
+    const table = await reserveModel.findByIdAndDelete(id)
+    if (!table) {
+      return res.send({ msg: "Table not found", flag: 1 })
+    }
+    return res.send({ msg: "Table deleted successfully", flag: 0 })
+  } catch (error) {
+    console.error("❌ Delete table error:", error.message)
+    return res.send({ msg: "Internal error", flag: 1 })
+  }
+}
+
+const update = async (req, res) => {
+  const { id } = req.params
+  try {
+    const table = await reserveModel.findByIdAndUpdate(id, req.body, { new: true })
+    if (!table) {
+      return res.send({ msg: "Table not found", flag: 1 })
+    }
+    return res.send({ msg: "Table updated successfully", flag: 0, data: table })
+  } catch (error) {
+    console.error("❌ Update table error:", error.message)
+    return res.send({ msg: "Internal error", flag: 1 })
+  }
+}
+
+module.exports = { create, get, Delete, update }
 

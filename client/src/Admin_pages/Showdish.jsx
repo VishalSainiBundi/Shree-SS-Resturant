@@ -376,7 +376,7 @@ const AdminDishes = () => {
   const handleDelete = async (id, name) => {
     if (window.confirm(`Are you sure you want to delete "${name}"?`)) {
       try {
-        await axiosApiInstance.delete(`/dishe/${id}`);
+        await axiosApiInstance.delete(`/dish/delete/${id}`);
         alert('✅ Dish deleted successfully!');
         fetchDishes();
       } catch (error) {
@@ -386,10 +386,9 @@ const AdminDishes = () => {
     }
   };
 
-  // Handle feature toggle
   const handleToggleFeature = async (id, currentStatus) => {
     try {
-      await axiosApiInstance.patch(`/dishe/${id}/toggle-feature`);
+      await axiosApiInstance.patch(`/dish/update/${id}`, { feature: !currentStatus });
       fetchDishes();
     } catch (error) {
       console.error('Error toggling feature:', error);

@@ -1,28 +1,14 @@
 const mongoose = require("mongoose");
 
-const tableBookingSchema = new mongoose.Schema(
+// This model represents a TABLE DEFINITION (not a booking).
+// It stores the restaurant's table inventory — tableNo, category, capacity, price, status.
+// Bookings are stored in reserveTableModel.js (ReserveTableBooking collection).
+const tableSchema = new mongoose.Schema(
   {
-    customerName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-
-    phone: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-
-    email: {
-      type: String,
-      trim: true,
-      default: "",
-    },
-
     tableNo: {
       type: String,
       required: true,
+      unique: true,
       trim: true,
     },
 
@@ -32,53 +18,28 @@ const tableBookingSchema = new mongoose.Schema(
       enum: ["Royal Dining", "Business Dining", "Classic Dining"],
     },
 
-    guests: {
-      type: Number,
-    //   required: true,
-      min: 1,
-    },
-
     price: {
       type: Number,
       required: true,
       min: 0,
     },
+
     capecity: {
       type: Number,
       required: true,
-      
+      min: 1,
     },
 
-    bookingDate: {
-      type: Date,
-      required: true,
-    },
-
-    bookingTime: {
-      type: String,
-      required: true,
-    },
-
-    // paymentStatus: {
-    //   type: String,
-    //   enum: ["Case", "Card", "Online"],
-    //   default: "Pending",
-    // },
+    // true = available, false = booked
     status: {
       type: Boolean,
-      default:true
+      default: true,
     },
-
-    // bookingStatus: {
-    //   type: String,
-    //   enum: ["Pending", "Confirmed", "Cancelled", "Completed"],
-    //   default: "",
-    // },
   },
   {
     timestamps: true,
   }
 );
 
-const reserveModel = mongoose.model("TableBooking", tableBookingSchema);
-module.exports = reserveModel
+const reserveModel = mongoose.model("TableBooking", tableSchema);
+module.exports = reserveModel;
