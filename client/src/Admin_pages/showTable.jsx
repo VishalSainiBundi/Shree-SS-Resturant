@@ -14,7 +14,7 @@ import {
   BriefcaseBusiness,
   UtensilsCrossed
 } from 'lucide-react';
-import axiosApiInstance from '../../helper';
+import axiosApiInstance from '../../helper'
 
 const AdminTables = () => {
   const [tables, setTables] = useState([]);
@@ -65,8 +65,8 @@ const AdminTables = () => {
   const handleDelete = async (id, tableNo) => {
     if (window.confirm(`Are you sure you want to delete Table "${tableNo}"?`)) {
       try {
-        // const res = await axiosApiInstance.delete(`/add_table/delete/${id}`);
-        const res = await axiosApiInstance.delete(`http://localhost:5000/add_table/delete/${id}`);
+        const res = await axiosApiInstance.delete(`/add_table/delete/${id}`);
+        // const res = await axiosApiInstance.delete(`http://localhost:5000/add_table/delete/${id}`);
         if (res.data.flag === 0) {
           // Remove from local state immediately — no refetch needed
           setTables(prev => prev.filter(t => t._id !== id));
