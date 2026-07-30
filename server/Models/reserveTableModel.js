@@ -140,7 +140,7 @@ reservetableSchema.pre("save", async function () {
 
   this.expiresAt = new Date(bookingDateTime.getTime() +2 * 60*  60 * 1000);
 
-  console.log("✅ expiresAt calculated:", this.expiresAt);
+  console.log("✅ expiresAt calculated:", this.expiresAt)
 });
 
 // 🗑️ TTL Index

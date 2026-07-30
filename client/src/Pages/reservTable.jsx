@@ -192,6 +192,7 @@ const BookTable = ({ table_data }) => {
       //   navigate('/auth')
       //   return alert('Please login')
       // }
+      // const response = await axiosApiInstance.post("/reserve/create", bookingData);
       const response = await axiosApiInstance.post("/reserve/create", bookingData);
 
 
