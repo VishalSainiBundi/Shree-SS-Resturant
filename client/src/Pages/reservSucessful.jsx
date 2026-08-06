@@ -44,7 +44,8 @@ const ReservationSuccess = ({ reserv = [] }) => {
     if (!confirmCancel) return;
 
     try {
-      const response = await axiosApiInstance.delete(`/reserve/delete/${reservation._id}`);
+      const response = await axios.delete(`http://localhost:5000/reserve/delete/${reservation._id}`);
+      // const response = await axiosApiInstance.delete(`/reserve/delete/${reservation._id}`);
       if (response.data.flag === 0) {
         alert("✅ Reservation cancelled successfully.");
         navigate("/");

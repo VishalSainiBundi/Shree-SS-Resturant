@@ -72,7 +72,7 @@ const BookTable = ({ table_data }) => {
   const user = useSelector(
     (state)=> state.userStore.user
   )
-  console.log(user,"userReduxTable")
+  // console.log(user,"userReduxTable")
 
   // Transform API data into sections structure
   const buildSections = () => {
@@ -184,8 +184,17 @@ const BookTable = ({ table_data }) => {
         specialRequest: specialRequest,
       };
 
-      // const response = await axios.post("http://localhost:5000/reserve/create", bookingData);
-      const response = await axiosApiInstance.post("/reserve/create", bookingData);
+      // console.log("Sending booking data:", bookingData);
+
+      // if(user){
+      // response = await axiosApiInstance.post("/reserve/create", bookingData);
+
+      // }else{
+      //   navigate('/auth')
+      //   return alert('Please login')
+      // }
+      const response = await axios.post("http://localhost:5000/reserve/create", bookingData);
+      // const response = await axiosApiInstance.post("/reserve/create", bookingData);
 
 
       console.log("Booking response:", response.data);
