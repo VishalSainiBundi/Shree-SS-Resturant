@@ -10,7 +10,7 @@ const DishDetail = ({ dishData, category }) => {
   const navigate = useNavigate();
   
 const user = useSelector(
-  (state)=> state.userStore.user.payload
+  (state)=> state.userStore.user
 )
 
 // console.log(user,"Redux")

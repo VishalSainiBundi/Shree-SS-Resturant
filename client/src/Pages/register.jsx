@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios  from "axios";
 import axiosApiInstance from "../../helper";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -60,7 +61,8 @@ function AuthPage() {
 
     setLoading(true);
     try {
-      const response = await axiosApiInstance.post("/user/login", loginData);
+      const response = await axios.post("http://localhost:5000/user/login", loginData);
+      // const response = await axiosApiInstance.post("/user/login", loginData);
       console.log("Login response:", response.data);
 
       // Check if login was successful (flag === 0 means success)

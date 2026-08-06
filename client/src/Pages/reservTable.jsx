@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import axiosApiInstance from "../../helper";
+import axios  from "axios";
 import {
   Search,
   Users,
@@ -192,8 +193,8 @@ const BookTable = ({ table_data }) => {
       //   navigate('/auth')
       //   return alert('Please login')
       // }
+      const response = await axios.post("http://localhost:5000/reserve/create", bookingData);
       // const response = await axiosApiInstance.post("/reserve/create", bookingData);
-      const response = await axiosApiInstance.post("/reserve/create", bookingData);
 
 
       console.log("Booking response:", response.data);
