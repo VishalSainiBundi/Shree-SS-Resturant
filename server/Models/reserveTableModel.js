@@ -50,6 +50,9 @@ const reservetableSchema = new mongoose.Schema(
       required: true,
       
     },
+    specialRequest:{
+      type:String
+    },
 
     bookingDate: {
       type: Date,

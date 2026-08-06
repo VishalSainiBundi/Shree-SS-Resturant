@@ -184,17 +184,8 @@ const BookTable = ({ table_data }) => {
         specialRequest: specialRequest,
       };
 
-      // console.log("Sending booking data:", bookingData);
-
-      // if(user){
-      // response = await axiosApiInstance.post("/reserve/create", bookingData);
-
-      // }else{
-      //   navigate('/auth')
-      //   return alert('Please login')
-      // }
-      const response = await axios.post("http://localhost:5000/reserve/create", bookingData);
-      // const response = await axiosApiInstance.post("/reserve/create", bookingData);
+      // const response = await axios.post("http://localhost:5000/reserve/create", bookingData);
+      const response = await axiosApiInstance.post("/reserve/create", bookingData);
 
 
       console.log("Booking response:", response.data);
