@@ -19,6 +19,8 @@ import VerifyEmail from "./Pages/verifyEmail";
 import getUser from "../api_calls/getUser";
 
 
+
+
 const Page_Router =() => {
 
 const [dish, setdish]= useState([])
@@ -26,6 +28,9 @@ const [category, setcategory]= useState([])
 const [table, settable] =useState([])
 const [reserv, setreserve] =useState([])
 const [user, setuser] =useState([])
+
+
+
 
 
 useEffect(() => {

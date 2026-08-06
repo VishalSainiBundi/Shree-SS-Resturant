@@ -225,7 +225,7 @@ const Send_VerifyCode = async (email, verifycode) => {
 
 // 📧 Shree SS Restaurant – Luxury Gold Theme (Color Upgrade Only)
 const Send_booking = async (bookData) => {
-  console.log(bookData)
+  // console.log(bookData)
   try {
     const formattedDate = new Date(bookData.bookingDate).toLocaleDateString('en-IN', {
       day: '2-digit',
@@ -676,9 +676,223 @@ const Send_booking = async (bookData) => {
     console.error('❌ Failed to send booking email:', error);
     throw error;
   }
+}
+
+
+const Send_booking_cancel = async (bookData) => {
+  try {
+    const formattedDate = new Date(bookData.bookingDate).toLocaleDateString(
+      "en-IN",
+      {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      }
+    );
+
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8" />
+      <style>
+        body{
+          margin:0;
+          padding:30px;
+          background:#f5f5f5;
+          font-family:Arial,sans-serif;
+        }
+        .container{
+          max-width:650px;
+          margin:auto;
+          background:#fff;
+          border-radius:15px;
+          overflow:hidden;
+          box-shadow:0 5px 20px rgba(0,0,0,.1);
+        }
+        .header{
+          background:#DC2626;
+          color:#fff;
+          padding:35px;
+          text-align:center;
+        }
+        .content{
+          padding:35px;
+        }
+        .title{
+          font-size:26px;
+          font-weight:bold;
+          margin-bottom:10px;
+        }
+        .info{
+          background:#FFF5F5;
+          border-left:5px solid #DC2626;
+          padding:15px;
+          margin:20px 0;
+          border-radius:8px;
+        }
+        .row{
+          margin:8px 0;
+        }
+        .label{
+          font-weight:bold;
+          color:#555;
+        }
+        .status{
+          display:inline-block;
+          margin-top:20px;
+          background:#DC2626;
+          color:#fff;
+          padding:8px 18px;
+          border-radius:30px;
+          font-weight:bold;
+        }
+        .footer{
+          background:#111827;
+          color:#fff;
+          text-align:center;
+          padding:25px;
+          font-size:14px;
+        }
+      </style>
+    </head>
+
+    <body>
+
+      <div class="container">
+
+        <div class="header">
+          <h1>❌ Reservation Cancelled</h1>
+          <p>Shree SS Restaurant</p>
+        </div>
+
+        <div class="content">
+
+          <div class="title">
+            Dear ${bookData.customerName || bookData.name},
+          </div>
+
+          <p>
+            Your reservation has been <strong>cancelled successfully.</strong>
+          </p>
+
+          <div class="info">
+
+            <div class="row">
+              <span class="label">Reservation ID :</span>
+              ${bookData.reservationId || bookData._id}
+            </div>
+
+            <div class="row">
+              <span class="label">Table :</span>
+              ${bookData.tableNo}
+            </div>
+
+            <div class="row">
+              <span class="label">Category :</span>
+              ${bookData.category}
+            </div>
+
+            <div class="row">
+              <span class="label">Guests :</span>
+              ${bookData.capecity}
+            </div>
+
+            <div class="row">
+              <span class="label">Date :</span>
+              ${formattedDate}
+            </div>
+
+            <div class="row">
+              <span class="label">Time :</span>
+              ${bookData.bookingTime}
+            </div>
+
+            <div class="row">
+              <span class="label">Email :</span>
+              ${bookData.email}
+            </div>
+
+            <div class="row">
+              <span class="label">Phone :</span>
+              ${bookData.phone}
+            </div>
+
+          </div>
+
+          <span class="status">
+            Reservation Cancelled
+          </span>
+
+          <p style="margin-top:30px;color:#666;">
+            We're sorry that you won't be joining us this time.
+            We hope to welcome you again soon.
+          </p>
+
+        </div>
+
+        <div class="footer">
+          📞 +91 98765 43210 <br><br>
+
+          ✉️ info@shreessrestaurant.com <br><br>
+
+          © ${new Date().getFullYear()} Shree SS Restaurant
+        </div>
+
+      </div>
+
+    </body>
+    </html>
+    `;
+
+    const textContent = `
+❌ RESERVATION CANCELLED
+
+Reservation ID : ${bookData.reservationId || bookData._id}
+
+Name : ${bookData.customerName || bookData.name}
+
+Phone : ${bookData.phone}
+
+Email : ${bookData.email}
+
+Table : ${bookData.tableNo}
+
+Category : ${bookData.category}
+
+Guests : ${bookData.capecity}
+
+Date : ${formattedDate}
+
+Time : ${bookData.bookingTime}
+
+Status : Cancelled
+
+Thank you for choosing Shree SS Restaurant.
+We hope to serve you soon.
+`;
+
+    const info = await transporter.sendMail({
+      from: '"Shree SS Restaurant" <sainisss1244@gmail.com>',
+      to: bookData.email,
+      subject: `❌ Reservation Cancelled - Shree SS (ID: ${
+        bookData.reservationId || bookData._id
+      })`,
+      text: textContent,
+      html: htmlContent,
+    });
+
+    console.log(
+      `✅ Cancellation email sent to ${bookData.email} (Message ID: ${info.messageId})`
+    );
+
+    return info;
+  } catch (error) {
+    console.error("❌ Failed to send cancellation email:", error);
+    throw error;
+  }
 };
 
 
 
-
-module.exports = {Send_VerifyCode, Send_booking};
+module.exports = {Send_VerifyCode, Send_booking,Send_booking_cancel };

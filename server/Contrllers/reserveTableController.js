@@ -1,6 +1,6 @@
 const reserveTableModel = require("../Models/reserveTableModel")
 const reserveModel      = require("../Models/reservModel")
-const { Send_booking }  = require("../middleware/Email")
+const { Send_booking, Send_booking_cancel }  = require("../middleware/Email")
 
 // ─────────────────────────────────────────────
 // POST /reserve/create
@@ -106,14 +106,36 @@ const status = async (req, res) => {
 // DELETE /reserve/delete/:id
 // ─────────────────────────────────────────────
 const Delete = async (req, res) => {
-  const { id } = req.params
+  const { id } = req.params;
+
   try {
-    await reserveTableModel.findByIdAndDelete(id)
-    return res.send({ msg: "Cancellation Successful", flag: 0 })
+    const bookData = await reserveTableModel.findByIdAndDelete(id);
+
+    if (!bookData) {
+      return res.send({
+        msg: "Reservation not found",
+        flag: 1,
+      });
+    }
+
+    console.log(bookData, "cancel data");
+
+    // Send cancellation email
+    await Send_booking_cancel(bookData);
+
+    return res.send({
+      msg: "Cancellation Successful",
+      flag: 0,
+    });
+
   } catch (error) {
-    console.error("❌ Delete error:", error.message)
-    return res.send({ msg: "Internal error", flag: 1 })
+    console.error("❌ Delete error:", error);
+
+    return res.send({
+      msg: "Internal error",
+      flag: 1,
+    });
   }
-}
+};
 
 module.exports = { bookTable, getBook, status, Delete }
