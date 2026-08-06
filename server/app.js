@@ -20,8 +20,7 @@ app.use(express.json());
 // CORS: Allow both local dev and production
 const allowedOrigins = [
   "http://localhost:5173",
-  "http://localhost:5174", 
-  "https://shree-ss-resturant.onrender.com"
+  "https://shree-ss-resturant.vercel.app"
 ];
 
 app.use(cors({

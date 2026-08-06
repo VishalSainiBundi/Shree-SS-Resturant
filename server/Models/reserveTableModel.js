@@ -89,34 +89,6 @@ const reservetableSchema = new mongoose.Schema(
   }
 );
 
-// const reserveTableModel = mongoose.model("ReserveTableBooking", reservetableSchema);
-// module.exports = reserveTableModel
-
-// const mongoose = require("mongoose");
-// console.log("✅ reserveTableModel Loaded");
-// const reservetableSchema = new mongoose.Schema(
-  
-//   {
-//     customerName: { type: String, required: true, trim: true },
-//     phone: { type: String, required: true, trim: true },
-//     email: { type: String, trim: true, default: "" },
-//     tableNo: { type: String, required: true, trim: true },
-//     category: { 
-//       type: String, 
-//       required: true, 
-//       enum: ["Royal Dining", "Business Dining", "Classic Dining"] 
-//     },
-//     guests: { type: Number, min: 1 },
-//     price: { type: Number, required: true, min: 0 },
-//     capecity: { type: Number, required: true },
-//     bookingDate: { type: Date, required: true },
-//     bookingTime: { type: String, required: true },
-//     status: { type: Boolean, default: true },
-//     expiresAt: { type: Date }   // Required nahi rakhna, taki pre-save fail na ho
-//   },
-//   { timestamps: true }
-// );
-
 
 // 🔥 Pre-save Hook — handles both "14:30" (HTML time input) and "02:30 PM" (Postman/12-hour)
 reservetableSchema.pre("save", async function () {
