@@ -680,6 +680,7 @@ const Send_booking = async (bookData) => {
 
 
 const Send_booking_cancel = async (bookData) => {
+  console.log()
   try {
     const formattedDate = new Date(bookData.bookingDate).toLocaleDateString(
       "en-IN",
